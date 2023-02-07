@@ -1,0 +1,1 @@
+[{"title":"producto prueba","description":"Este es un producto prueba","price":200,"thumbnail":"Sin imagen","code":"abc123","stock":25,"id":0},{"title":"La mano arriba","description":"cintura sola","price":15,"thumbnail":"la media vuelta","code":"DANZA KUDURO","stock":2,"id":1}]
