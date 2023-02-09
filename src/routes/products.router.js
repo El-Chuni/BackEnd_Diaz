@@ -17,7 +17,7 @@ router.get('/get', (req,res) => {
 router.get('/get/:pid', (req, res) => {
     let pid = parseInt(req.params.pid);
     let productFound = products.find(product => product.id === pid);
-  
+
     res.send(productFound || {});
   })
 
@@ -41,7 +41,7 @@ router.post('/post', upload.array(), (req,res) => {
         }else{
             product.status = true;
         }
-        
+
         products.push(product);
         console.log(products);
         res.send(products);
@@ -62,6 +62,25 @@ router.delete('/delete/:pid', (req,res) => {
         console.error("not found or already deleted.")
         res.send("Not found or already deleted.");
     }
+})
+
+router.put('/put/:pid', upload.array(), (req,res) =>{
+    let pid = parseInt(req.params.pid);
+    let productUpdate = req.body;
+    let productFound = products.find((product) => product.id === pid);
+
+    if (productFound){
+        products = products.map(product => {
+            if (product.id === pid) {
+                return { ...product, ...productUpdate };
+            }    
+            return product;
+        })
+    }else{
+        res.status(404).send({status: "Error", message: "El producto no existe, use GET para verificar su existencia."});
+    }
+    
+    res.send(products);
 })
 
 export default router;
