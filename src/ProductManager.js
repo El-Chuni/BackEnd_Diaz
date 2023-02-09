@@ -17,13 +17,16 @@ class Product {
 
 export default class ProductManager {
     constructor(){
-        this.products = []
         this.filePath = './ProductList.txt';
         fs.readFile(this.filePath, 'utf-8', (error, result) => {
             if (error){
-                return fs.writeFile(this.filePath, this.products)
+                this.products = [];
+                fs.writeFile(this.filePath, JSON.stringify(this.products), (err) => {
+                  if (err) throw err;
+                  console.log('The file has been saved!');
+                });
             } else {
-                return this.products.push(result)
+                this.products = JSON.parse(result);
             }
         })
     }
@@ -34,13 +37,10 @@ export default class ProductManager {
 
         if(!codeFound){
             let id = this.products.length
-            //let id = Math.floor(Math.random() * 9999)
             const product = new Product(title, description, price, thumbnail, code, stock, id)
             this.products.push(product)
-            console.log('Product ${product.title} successfully added.')
+            console.log(`Product ${product.title} successfully added.`)
             fs.writeFileSync(this.filePath, JSON.stringify(this.products))
-            /*Usaría append pero por como está escrito el codigo me sirve mejor
-            esto para verificar directamente el this.products así no cambio mucho*/
         }else{
             console.log("We already have this, try again or leave.")
         }
