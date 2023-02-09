@@ -1,11 +1,20 @@
 import express from 'express';
 import ProductManager from './ProductManager.js';
+import productsRouter from './routes/products.router.js';
 
 const app = express();
 const SERVER_PORT = 8080;
+const server = app.listen(SERVER_PORT, () => {
+  console.log(`No abran cualquier cosa en el server numero ${SERVER_PORT}.`);
+});
+
 let managerDeProductos = new ProductManager();
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(express.static('public'))
+
+app.use('/api/products', productsRouter);
 
 app.get('/saludo', (req, res) => {
   res.send("https://www.youtube.com/watch?v=3V93ZyaiDPA");
@@ -31,6 +40,3 @@ app.get('/products/:pid', (req, res) => {
   res.send(productFound || {});
 });
 
-app.listen(SERVER_PORT, () => {
-  console.log(`No abran cualquier cosa en el server numero ${SERVER_PORT}.`);
-});
