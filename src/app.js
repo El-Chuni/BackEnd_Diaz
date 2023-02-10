@@ -1,6 +1,7 @@
 import express from 'express';
 import ProductManager from './ProductManager.js';
 import productsRouter from './routes/products.router.js';
+import cartsRouter from './routes/carts.router.js';
 
 const app = express();
 const SERVER_PORT = 8080;
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.static('public'))
 
 app.use('/api/products', productsRouter);
+app.use('/api/carts', cartsRouter);
 
 app.get('/saludo', (req, res) => {
   res.send("https://www.youtube.com/watch?v=3V93ZyaiDPA");

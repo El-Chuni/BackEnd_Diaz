@@ -9,7 +9,7 @@ const upload = multer({ storage });
 let products = [{"title":"La mano arriba","description":"cintura sola","price":15,"thumbnail":"la media vuelta","code":"DANZA KUDURO","stock":2,"id":1,"status": true, "category": "test"}];
 
 router.get('/get', (req,res) => {
-    console.log("Cargando productos...");
+    console.log("Loading products...");
     console.log(products);
     res.send(products);
 })
@@ -17,22 +17,26 @@ router.get('/get', (req,res) => {
 router.get('/get/:pid', (req, res) => {
     let pid = parseInt(req.params.pid);
     let productFound = products.find(product => product.id === pid);
-
-    res.send(productFound || {});
-  })
+    
+    productFound ? res.send(productFound) : res.status(404).send({status: "Error", message: "The product doesn't exist, use GET to check the inventory."});
+})
 
 router.post('/post', upload.array(), (req,res) => {
     let product = req.body; 
+
     product.id = Math.floor(Math.random()*1000+1);
+    while (products.find((existingProduct) => existingProduct.id === product.id)){
+        product.id = Math.floor(Math.random()*1000+1);
+    }
 
     if (!product.title || !product.description || !product.code || !product.price || !product.stock || !product.category) {
-        console.error("Producto no valido, revise sus datos e intentelo de nuevo.");
+        console.error("Invalid product, check it and try again.");
         console.error(product);
-        res.status(400).send({status: "Error", message: "Producto no valido, revise sus datos e intentelo de nuevo."});
+        res.status(400).send({status: "Error", message: "Invalid product, check it and try again."});
     }else{
         let productFound = products.find(existingProduct => existingProduct.code === product.code);
         if (productFound){
-            return res.status(406).send({status: "Error", message: "Producto ya existente, para actualizar use PUT."});
+            return res.status(406).send({status: "Error", message: "The product already exists, if you want to update it use PUT instead."});
         }
 
         if (!product.status){
@@ -77,7 +81,7 @@ router.put('/put/:pid', upload.array(), (req,res) =>{
             return product;
         })
     }else{
-        res.status(404).send({status: "Error", message: "El producto no existe, use GET para verificar su existencia."});
+        res.status(404).send({status: "Error", message: "The product doesn't exist, use GET to check the inventory."});
     }
     
     res.send(products);

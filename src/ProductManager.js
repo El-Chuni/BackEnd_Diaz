@@ -84,19 +84,6 @@ export default class ProductManager {
             console.error("not found or already deleted")
         }
     }
-
-    tester(){
-        this.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25)
-        this.getProducts()
-        this.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25)
-        this.getProducts()
-        this.addProduct("La mano arriba", "cintura sola", 15, "la media vuelta", "DANZA KUDURO", 2)
-        this.getProductById(1)
-        this.updateProduct(1, ("I AM THE STORM", "THAT IS APPROACHING", 400, "PROVOKING", "BLACK CLOUDS IN ISOLATION", 8001))
-        this.getProductById(1)
-        this.deleteProduct(1)
-        this.getProducts()
-    }
 }
 
 let managerDeProductos = new ProductManager()
