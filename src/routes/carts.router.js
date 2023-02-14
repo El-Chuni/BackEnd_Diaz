@@ -43,7 +43,7 @@ router.post('/post', upload.array(), (req,res) => {
     //Se define el carrito con un ID y un array con los productos que lleva
     let cart = {
         id: id,
-        products: products
+        products: [...products]
     };
 
     carts.push(cart);
@@ -77,12 +77,10 @@ router.post('/post/:cid/product/:pid', (req,res) => {
         }else{
             //Caso contrario, le sumamos uno.
             productFound.quantity++;
-            cartFound = cartFound.map(product => {
-                if (product.id === pid) {
-                    return {...productFound};
-                }
-                return product;
-            });
+            cartFound = {
+                ...cartFound,
+                products: cartFound.products.map(product => product.id === pid ? productFound : product)
+              };
         }
 
         //Actualizamos el carrito
