@@ -64,7 +64,7 @@ router.post('/post/:cid/product/:pid', (req,res) => {
 
     if (cartFound){
         //Ahora hacemos lo mismo buscando si existe en producto en el carrito
-        let productFound = cartFound.find(product => product.id === pid);
+        let productFound = cartFound.products.find(product => product.id === pid);
 
         if(!productFound){
             //Si no existe, añadimos el producto
