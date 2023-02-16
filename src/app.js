@@ -35,6 +35,10 @@ app.use(express.static(__dirname+'/public'))
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 
+socketServer.on('connection', socket => {
+  console.log("Welcome to the server.")
+})
+
 app.get('/', (req, res) => {
   let testUser = {
     name: "babe"
@@ -66,4 +70,5 @@ app.get('/products/:pid', (req, res) => {
 
   res.send(productFound || {});
 });
+
 
