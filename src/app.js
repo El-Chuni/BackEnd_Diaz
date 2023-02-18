@@ -15,6 +15,7 @@ const server = app.listen(SERVER_PORT, () => {
   console.log(`No abran cualquier cosa en el server numero ${SERVER_PORT}.`);
 });
 
+//Se crea el Websocket server
 const socketServer = new Server(server)
 
 
@@ -35,8 +36,13 @@ app.use(express.static(__dirname+'/public'))
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 
+//Se inicia el Websocket server
 socketServer.on('connection', socket => {
   console.log("Welcome to the server.")
+
+  socket.on('home',data=>{
+    console.log(data);
+  })
 })
 
 app.get('/', (req, res) => {

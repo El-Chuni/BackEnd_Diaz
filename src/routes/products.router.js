@@ -18,6 +18,11 @@ router.get('/get', (req,res) => {
     res.send(products);
 })
 
+//Lo mismo que /get pero con socket.io
+router.get('/', (req,res) => {
+    res.render('home',{products});
+})
+
 
 //Carga y muestra un producto en particular
 router.get('/get/:pid', (req, res) => {
