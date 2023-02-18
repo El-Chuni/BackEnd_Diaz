@@ -1,9 +1,8 @@
-//const fs = require('fs');
 import fs from 'fs';
 
-class Product {
+export class Product {
     
-    constructor(title, description, price, thumbnail, code, stock, id){
+    constructor(title, description, price, thumbnail, code, stock, id, status, category){
         this.title = title;
         this.description = description;
         this.price = price;
@@ -11,6 +10,8 @@ class Product {
         this.code = code;
         this.stock = stock;
         this.id = id;
+        this.status = status;
+        this.category = category;
     }
     
 }
@@ -31,71 +32,74 @@ export default class ProductManager {
         })
     }
 
-    addProduct(title, description, price, thumbnail, code, stock){
-
-        const codeFound = this.products.find((product) => product.code === code)
-
-        if(!codeFound){
-            let id = this.products.length
-            const product = new Product(title, description, price, thumbnail, code, stock, id)
-            this.products.push(product)
-            console.log(`Product ${product.title} successfully added.`)
-            fs.writeFileSync(this.filePath, JSON.stringify(this.products))
-        }else{
-            console.log("We already have this, try again or leave.")
+    addProduct(newProduct) {
+        const { title, description, price, thumbnail, code, stock, category } = newProduct;
+        
+        const existingProduct = this.products.find(product => product.code === newProduct.code);
+        if (existingProduct) {
+            throw new Error(`Product with code ${product.code} already exists, try another one.`);
         }
-    }
+        
+        const id = Math.floor(Math.random()*1000+1);
+        const status = true;
 
-    getProducts(){
-        const detailsOfProducts = this.products.map((product) => Object.entries(product))
-        console.log("detailsOfProducts",detailsOfProducts)
+        const product = new Product(title, description, price, thumbnail, code, stock, id, status, category);
+
+        while (this.products.find(existingProduct => existingProduct.id === product.id)) {
+            product.id = Math.floor(Math.random()*1000+1);
+        }
+    
+        this.products.push(product);
+        console.log(`Product ${product.title} successfully added.`);
+        fs.writeFileSync(this.filePath, JSON.stringify(this.products));
+    }
+    
+    getProducts() {
+        console.log(this.products);
+        const data = fs.readFileSync(this.filePath, 'utf8');
+        return JSON.parse(data).map(productData => new Product(productData));
     }
 
     getProductById(id){
-        let productFound = this.products.find(product => product.id === id)
+        const productFound = this.products.find(product => product.id === id)
 
-        productFound ? console.log(Object.values(productFound)) : console.error("not found")
+        if (productFound) {
+            console.log(productFound);
+            return productFound;
+        } else {
+            console.error("Product not found.")
+        }
     }
 
     updateProduct(id, productUpdate){
-        const productFound = this.products.find((product) => product.id === id)
-        
+        let productFound = this.products.find((product) => product.id === id)
 
         if (productFound) {
-            const arrayUpdate = this.products.filter(product => product.id !== id)
-            
-            arrayUpdate.push({id, ...productUpdate})
-
-            this.products = arrayUpdate
-
-            console.log("Product updated.")
-        }else{
-            console.error("not found")
+            const updatedProduct = { ...productFound, ...productUpdate }
+            const updatedProducts = this.products.map(product => {
+                if (product.id === id) {
+                    return updatedProduct
+                }
+                return product
+            })
+            this.products = updatedProducts
+            fs.writeFileSync(this.filePath, JSON.stringify(this.products))
+            console.log("Product updated successfully.")
+        } else {
+            console.error("Product not found.")
         }
     }
 
     deleteProduct(id){
-        let productFound = this.products.find((product) => product.id === id)
-        if (productFound){
-            this.products.filter(product => product.id !== id)
+        const updatedProducts = this.products.filter(product => product.id !== id)
 
-            console.log("Product deleted")
-        }else{
-            console.error("not found or already deleted")
+        if (this.products.length === updatedProducts.length) {
+            console.error("Product not found.")
+        } else {
+            this.products = updatedProducts
+            fs.writeFileSync(this.filePath, JSON.stringify(this.products))
+            console.log("Product deleted successfully.")
         }
     }
 }
-
-let managerDeProductos = new ProductManager()
-//managerDeProductos.tester()
-/*managerDeProductos.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25)
-managerDeProductos.getProducts()
-managerDeProductos.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25)
-managerDeProductos.getProducts()
-managerDeProductos.addProduct("La mano arriba", "cintura sola", 15, "la media vuelta", "DANZA KUDURO", 2)
-managerDeProductos.getProductById(1)
-managerDeProductos.updateProduct(1, ("I AM THE STORM", "THAT IS APPROACHING", 400, "PROVOKING", "BLACK CLOUDS IN ISOLATION", 8001))
-managerDeProductos.getProductById(1)
-managerDeProductos.deleteProduct(1)
-managerDeProductos.getProducts()*/
 
