@@ -13,9 +13,6 @@ const productManager = new ProductManager();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-//Hago una lista de productos ya predefinida con un producto, así muestra un ejemplo en el /get desde el principio
-let products = [{"title":"La mano arriba","description":"cintura sola","price":15,"thumbnail":"la media vuelta","code":"DANZA KUDURO","stock":2,"id":1,"status": true, "category": "test"}];
-
 //Carga y muestra los productos
 router.get('/get', (req,res) => {
     console.log("Loading products...");
