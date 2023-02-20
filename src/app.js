@@ -42,6 +42,7 @@ app.use('/realtimeproducts', viewsRouter);
 socketServer.on('connection', (socket) => {
   console.log(`Socket connected: ${socket.id}`);
 
+  socket.emit('updateViews', { products: productManager.getProducts() });
   
   socket.on('views', (data) => {
     console.log(`Received data: ${data}`);

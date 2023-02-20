@@ -1,17 +1,17 @@
 <div id="productsView">
     {{#each products}}
         <div class="product">
-            <h3>{{this.title}}</h3>
-            <p>{{this.description}}</p>
-            <p>Price: {{this.price}}</p>
-            <p>Thumbnail: {{this.thumbnail}}</p>
-            <p>Code:{{this.code}}</p>
-            <p>Stock: {{this.stock}}</p>
-            <p>ID: {{this.id}}</p>
-            <p>status: {{this.status}}</p>
-            <p>Category: {{this.category}}</p>
+            <h3>{{this.title.title}}</h3>
+            <p>{{this.title.description}}</p>
+            <p>Price: {{this.title.price}}</p>
+            <p>Thumbnail: {{this.title.thumbnail}}</p>
+            <p>Code:{{this.title.code}}</p>
+            <p>Stock: {{this.title.stock}}</p>
+            <p>ID: {{this.title.id}}</p>
+            <p>status: {{this.title.status}}</p>
+            <p>Category: {{this.title.category}}</p>
         </div>
     {{/each}}
 </div>
 <script src="/socket.io/socket.io.js"></script>
-<script src="/js/views.js"></script>
+<script src="../public/js/views.js"></script>

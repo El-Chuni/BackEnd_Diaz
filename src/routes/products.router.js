@@ -43,9 +43,12 @@ router.post('/post', upload.array(), (req,res) => {
     try {
         productManager.addProduct(product);
         res.send(productManager.getProducts());
+        socket.emit('newProduct', { products: productManager.getProducts() });
     } catch (error) {
         res.status(400).send({status: "Error", message: error.message});
-    }
+    };
+
+    
 })
 
 //Se borra un producto especifico por ID
@@ -56,6 +59,7 @@ router.delete('/delete/:pid', (req,res) => {
     try {
         productManager.deleteProduct(pid);
         res.send("Product deleted.");
+        socket.emit('deleteProduct', { products: productManager.getProducts() });
     } catch (error) {
         res.status(404).send({status: "Error", message: error.message});
     }
