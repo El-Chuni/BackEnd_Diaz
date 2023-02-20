@@ -1,4 +1,5 @@
 const socket = io();
+const productsContainer = document.getElementById('productsViews');
 
 socket.on('connect', () => {
     console.log('Connected to socket server');
@@ -6,7 +7,7 @@ socket.on('connect', () => {
 
 // Escuchar el evento 'updateProducts' del servidor y actualizar la vista
 socket.on('updateViews', ({ products }) => {
-  const productsContainer = document.getElementById('productsViews');
+  
   let newProductsHTML = '';
 
   products.forEach((product) => {
