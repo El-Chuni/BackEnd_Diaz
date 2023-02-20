@@ -42,8 +42,8 @@ router.post('/post', upload.array(), (req,res) => {
     const product = req.body;
     try {
         productManager.addProduct(product);
+        //socket.emit('newProduct', { products: productManager.getProducts() });
         res.send(productManager.getProducts());
-        socket.emit('newProduct', { products: productManager.getProducts() });
     } catch (error) {
         res.status(400).send({status: "Error", message: error.message});
     };
@@ -58,8 +58,8 @@ router.delete('/delete/:pid', (req,res) => {
     //Se verifica si existe y lo borra, sino manda error.
     try {
         productManager.deleteProduct(pid);
+        //socket.emit('deleteProduct', { products: productManager.getProducts() });
         res.send("Product deleted.");
-        socket.emit('deleteProduct', { products: productManager.getProducts() });
     } catch (error) {
         res.status(404).send({status: "Error", message: error.message});
     }
