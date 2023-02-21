@@ -5,7 +5,7 @@ socket.on('connect', () => {
     console.log('Connected to socket server');
 });
 
-// Escuchar el evento 'updateProducts' del servidor y actualizar la vista
+// Escuchar el evento 'updateViews' del servidor y actualizar la vista
 socket.on('updateViews', ({ products }) => {
   
   let newProductsHTML = '';
