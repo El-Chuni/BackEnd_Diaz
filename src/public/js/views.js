@@ -29,4 +29,7 @@ socket.on('updateViews', ({ products }) => {
   productsContainer.innerHTML = newProductsHTML;
 });
 
-socket.emit('views', 'Testing views'); 
+
+setInterval(() => {
+  socket.emit('views', 'Testing views'); 
+}, 3000)
