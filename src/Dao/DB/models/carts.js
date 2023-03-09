@@ -4,12 +4,22 @@ const cartsCollection = 'carts';
 
 const cartSchema = new mongoose.Schema({
     id: {
-        type: String,
+        type: Number,
         unique: true,
         require: true,
     },
     products: {
-        type: Array,
+        type: [{
+            id: {
+                type: Number,
+                unique: true,
+                require: true
+            },
+            stock: {
+                type: Number,
+                require: true
+            }
+        }],
         require: true,
     }
 });
