@@ -1,4 +1,4 @@
-import { cartModel } from "./models/carts"; 
+import { cartModel } from "./models/carts.js"; 
 
 const getCarts = async () => cartModel.find();
 
