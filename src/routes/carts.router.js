@@ -1,5 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
+import { getCarts, getCartById, addCart, updateCart, deleteCart } from "../Dao/DB/carts.service.js";
 
 //Se define el router
 const router = Router();
@@ -9,19 +10,25 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 //Se define el array de carritos (Comienza vacío en este caso)
-let carts = [];
+//Edit: Debido a la implementación de MongoDB, este array en particular fue suspendido hasta que se defina todo el FileSystem
+//let carts = [];
 
 //Carga y muestra cada carrito
-router.get('/get', (req,res) => {
+router.get('/get', async (req,res) => {
     console.log("Loading carts...");
+    
+    const carts = await getCarts();
+    
     console.log(carts);
     res.send(carts);
 })
 
 //Carga un carrito en especifico.
-router.get('/get/:cid', (req, res) => {
+router.get('/get/:cid', async (req, res) => {
     let cid = parseInt(req.params.cid);
-    let cartFound = carts.find(cart => cart.id === cid);
+
+    let cartFound = await getCartById(cid);
+    //let cartFound = carts.find(cart => cart.id === cid);
 
     //Esta condicional pregunta si se encontró el carrito en el array
     //Si se encontró, lo muestra.
@@ -30,9 +37,9 @@ router.get('/get/:cid', (req, res) => {
 })
 
 //Añade un carrito al array.
-router.post('/post', upload.array(), (req,res) => {
+router.post('/post', upload.array(), async (req,res) => {
     let products = req.body; 
-    
+    const carts = await getCarts();
     //Se hace esto para evitar que se repita el ID
     //Se genera una y otra vez hasta que se vuelva único
     let id = Math.floor(Math.random()*1000+1);
@@ -46,18 +53,20 @@ router.post('/post', upload.array(), (req,res) => {
         products: [...products]
     };
 
-    carts.push(cart);
+    //carts.push(cart);
+    await addCart(cart);
     console.log(carts);
     res.send(carts);
 })
 
 //Se añade un producto especifico a un carrito especifico.
-router.post('/post/:cid/product/:pid', (req,res) => {
+router.post('/post/:cid/product/:pid', async (req,res) => {
     let cid = parseInt(req.params.cid);
     let pid = parseInt(req.params.pid);
+    //Este quantity solo existe de testeo, no vamos a usarlo de verdad
     let quantity = parseInt(req.query.quantity);
 
-    
+    const carts = await getCarts();    
 
     //Se verifica la existencia del producto en el carrito
     let cartFound = carts.find(cart => cart.id === cid);
@@ -84,12 +93,13 @@ router.post('/post/:cid/product/:pid', (req,res) => {
         }
 
         //Actualizamos el carrito
-        carts = carts.map(cart => {
+        await updateCart(cid, cartFound)
+        /*carts = carts.map(cart => {
             if (cart.id === cid) {
                 return {...cartFound};
             }
             return cart;
-        })
+        })*/
 
     }else{
 

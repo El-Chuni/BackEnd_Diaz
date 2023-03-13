@@ -1,5 +1,6 @@
 import express from 'express';
 import Handlebars from 'express-handlebars';
+import mongoose from 'mongoose';
 import ProductManager from './ProductManager.js';
 import productsRouter from './routes/products.router.js';
 import cartsRouter from './routes/carts.router.js';
@@ -49,6 +50,20 @@ socketServer.on('connection', (socket) => {
     socketServer.emit('updateViews', { products: productManager.getProducts() });
   });
 });
+
+//Se conecta a MongoDB
+const connectMongoDB = async ()=>{
+  try {
+      //Usuario: TestMongo
+      //Contraseña: Gvy7CjhQf9zlMSgo
+      await mongoose.connect('mongodb+srv://TestMongo:Gvy7CjhQf9zlMSgo@cluster0.lg3tyb6.mongodb.net/test');
+      console.log("Conectado con exito a MongoDB usando Moongose.");
+  } catch (error) {
+      console.error("No se pudo conectar a la BD usando Moongose: " + error);
+      process.exit();
+  }
+};
+connectMongoDB();
 
 
 app.get('/', (req, res) => {
