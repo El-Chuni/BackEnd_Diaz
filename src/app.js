@@ -5,8 +5,10 @@ import ProductManager from './ProductManager.js';
 import productsRouter from './routes/products.router.js';
 import cartsRouter from './routes/carts.router.js';
 import viewsRouter from './routes/views.router.js';
+import chatRouter from './routes/chat.router.js';
 import __dirname from './utils.js';
 import { Server } from 'socket.io';
+import { getMessages, addMessage } from './Dao/DB/messages.service.js';
 
 
 //Se hace lo necesario para activar el server
@@ -37,17 +39,23 @@ app.use(express.static(__dirname+'/public'))
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/realtimeproducts', viewsRouter);
-
+app.use('/api/chat', chatRouter)
 
 //Se inicia el Websocket server
 socketServer.on('connection', (socket) => {
   console.log(`Socket connected: ${socket.id}`);
 
-  
   socket.on('views', (data) => {
     console.log(`Received data: ${data}`);
-    
     socketServer.emit('updateViews', { products: productManager.getProducts() });
+  });
+
+  socket.on('message', async (data) => {
+    console.log(`Received data: ${data}`);
+    const message = JSON.parse(data);
+    await addMessage(message.user, message.message);
+    const messages = await getMessages();
+    socketServer.emit('updateMessages', { messages });
   });
 });
 
@@ -56,7 +64,7 @@ const connectMongoDB = async ()=>{
   try {
       //Usuario: TestMongo
       //Contraseña: Gvy7CjhQf9zlMSgo
-      await mongoose.connect('mongodb+srv://TestMongo:Gvy7CjhQf9zlMSgo@cluster0.lg3tyb6.mongodb.net/test');
+      await mongoose.connect('mongodb+srv://TestMongo:Gvy7CjhQf9zlMSgo@cluster0.lg3tyb6.mongodb.net/ecommerce');
       console.log("Conectado con exito a MongoDB usando Moongose.");
   } catch (error) {
       console.error("No se pudo conectar a la BD usando Moongose: " + error);
