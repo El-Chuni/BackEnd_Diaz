@@ -3,7 +3,7 @@
 
     <div id="log">
         {{#each messages}}
-        <p>{{this.user}}: {{this.message}}</p>
+        <p>{{this.user}}: {{message}}</p>
         {{/each}}
     </div>
 
@@ -16,8 +16,6 @@
         <label for="textoEntrada">Mensaje:</label>
         <input type="text" class="form-control" id="textoEntrada" placeholder="Escribe tu mensaje aquí">
     </div>
-
-    <button id="enviarMensaje" class="btn btn-primary">Enviar</button>
 
 </div>
 

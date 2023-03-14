@@ -1,41 +1,35 @@
-import { addMessage } from "../../Dao/DB/messages.service";
-
 const socket = io();
-socket.emit("message", "Hola, me estoy comunicando con un websocket!");
+socket.emit("saludo", "Hola, me estoy comunicando con un websocket!");
 
 const input = document.getElementById('textoEntrada');
 const log = document.getElementById('log');
-const user = document.getElementById('nombreUsuario');
 
 input.addEventListener('keyup', async (evt) => {
     if (evt.key === "Enter") {
         const message = input.value;
-        const userName = user.value;
-        console.log(`Agregando mensaje: ${message} de ${userName}`);
-        await addMessage(userName, message);
+        const user = document.getElementById('nombreUsuario').value;
+        console.log(`Agregando mensaje: ${message} de ${user}`);
+        socket.emit('message', JSON.stringify({user, message}));
         input.value = "";
     }
 });
-
-
   
 socket.on('updateMessages', messages => {
-    const messageList = document.getElementById('messageList');
-    messageList.innerHTML = ''; // Limpiamos la lista de mensajes previos
-    messages.forEach(msg => {
-      const messageItem = document.createElement('li');
-      messageItem.textContent = `${msg.user} dice: ${msg.message}`;
-      messageList.appendChild(messageItem);
-    });
+  const log = document.getElementById('log');
+  log.innerHTML = ''; // Limpiamos la lista de mensajes previos
+  messages.forEach(msg => {
+    const messageItem = document.createElement('p');
+    messageItem.innerText = `${msg.user}: ${msg.message}`;
+    log.appendChild(messageItem);
   });
+});
+
+socket.on('log',data=>{
+  let logs='';
+  data.logs.forEach(log=>{
+      logs += `${log.socketid} dice: ${log.message}<br/>`
+  })
+  log.innerHTML=logs;
+});
   
 
-fetch('/api/chat')
-.then(response => response.json())
-.then(data => {
-  console.log('Success:', data);
-  socket.emit('views', '');
-})
-.catch((error) => {
-  console.error('Error:', error);
-});

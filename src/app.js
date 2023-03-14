@@ -50,12 +50,16 @@ socketServer.on('connection', (socket) => {
     socketServer.emit('updateViews', { products: productManager.getProducts() });
   });
 
+  socket.on("saludo", data => {
+    console.log(data);
+  });
+  
   socket.on('message', async (data) => {
     console.log(`Received data: ${data}`);
     const message = JSON.parse(data);
     await addMessage(message.user, message.message);
     const messages = await getMessages();
-    socketServer.emit('updateMessages', { messages });
+    socketServer.emit('updateMessages', messages);
   });
 });
 
