@@ -7,18 +7,18 @@ const cartSchema = new mongoose.Schema({
         type: Number,
         unique: true,
         require: true,
+        index: true
     },
     products: {
         type: [{
             id: {
                 type: Number,
-                unique: true,
                 require: true
             },
             stock: {
                 type: Number,
                 require: true,
-                default: 0
+                default: 1
             }
         }],
         default: [],
