@@ -3,10 +3,7 @@ import { cartModel } from "./models/carts.js";
 const getCarts = async () => cartModel.find();
 
 const getCartById = async (cid) => {
-  const cartFound = await cartModel.findOne({ _id: cid }).populate({
-    path: 'products.product',
-    select: 'title'
-  });
+  const cartFound = await cartModel.findOne({ _id: cid }).populate('products.product');
   return cartFound;
 };
 
