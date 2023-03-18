@@ -25,7 +25,7 @@ router.get('/get', async (req,res) => {
     
     let products = await getProductsByParams(limit, page, query, sort);
     console.log(products);
-    products.length > 0 ? res.send(products) : res.status(404).send({status: "Error", message: "No se encontraron productos"});
+    products ? res.send(products) : res.status(404).send({status: "Error", message: "No se encontraron productos"});
 })
 
 //Lo mismo que /get pero con socket.io
