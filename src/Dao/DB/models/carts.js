@@ -1,18 +1,25 @@
 import mongoose from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 const cartsCollection = 'carts';
 
 const cartSchema = new mongoose.Schema({
     id: {
-        type: Number,
+        type: mongoose.Schema.Types.ObjectId,
         unique: true,
         require: true,
         index: true
     },
     products: {
         type: [{
+            /*_id: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'products',
+                require: true
+            },*/
             id: {
-                type: Number,
+                type: String,
+                ref: 'products',
                 require: true
             },
             stock: {
@@ -26,4 +33,6 @@ const cartSchema = new mongoose.Schema({
     }
 });
 
+
+cartSchema.plugin(mongoosePaginate);
 export const cartModel = mongoose.model(cartsCollection, cartSchema)

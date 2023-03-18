@@ -31,6 +31,13 @@ const addProduct = async (body) => productModel.create(body);
 
 const updateProduct = async (pid, update) => productModel.findOneAndUpdate({id: pid}, update);
 
-const deleteProduct = async (pid) =>  productModel.deleteOne({id: pid}, (err) => { if (err) return handleError(err);});
-
+const deleteProduct = async (pid) => {
+    try {
+      await productModel.deleteOne({ id: pid });
+    } catch (error) {
+      console.log(error);
+      throw new Error('Error deleting product');
+    }
+}
+  
 export { getProducts, getProductById, getProductsByParams, addProduct, updateProduct, deleteProduct }

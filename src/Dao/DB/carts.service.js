@@ -1,8 +1,12 @@
-import { cartModel } from "./models/carts.js"; 
+import { cartModel } from "./models/carts.js";
 
 const getCarts = async () => cartModel.find();
 
-const getCartById = async (cid) => cartModel.findById(cid);
+const getCartById = async (cid) => {
+  const cartFound = await cartModel.findOne({ _id: cid }).populate({ path: 'products.id', model: 'products', select: '-__v', populate: { path: 'category', model: 'categories', select: '-__v' }});
+  return cartFound;
+};
+
 
 const addCart = async (body) => cartModel.create(body);
 
@@ -14,6 +18,27 @@ const updateCart = async (cid, update) => {
     );
 };
 
-const deleteCart = async (cid) =>  cartModel.deleteOne({id: cid}, (err) => { if (err) return handleError(err);});
+const replaceCartContent = async (cid, products) => cartModel.replaceOne({ id: cid }, { products: products }); 
 
-export { getCarts, getCartById, addCart, updateCart, deleteCart }
+const updateCartProductStock = async (cid, pid, stock) => {
+  return cartModel.updateOne(
+    { id: cid, "products.id": pid},
+    { $set: { "products.$.stock": stock }}
+  );
+};
+
+const removeFromCart = async (cid, pid) => {
+  cartModel.update(
+    { id: cid },
+    { $pull : { products : { id: pid } } })
+}
+
+const deleteCart = async (cid) => {
+  try {
+      await cartModel.deleteOne({_id: cid});
+  } catch (err) {
+      console.log(err);
+  }
+}
+
+export { getCarts, getCartById, addCart, updateCart, deleteCart, removeFromCart, replaceCartContent, updateCartProductStock }

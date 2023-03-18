@@ -34,13 +34,14 @@ const productSchema = new mongoose.Schema({
         require: true,
     },
     id: {
-        type: Number,
+        type: mongoose.Schema.Types.ObjectId,
         require: true,
         index: true
     },
     status: {
         type: Boolean,
         require: true,
+        default: true
     }
 });
 
