@@ -33,11 +33,6 @@ const productSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
-    id: {
-        type: mongoose.Schema.Types.ObjectId,
-        require: true,
-        index: true
-    },
     status: {
         type: Boolean,
         require: true,
