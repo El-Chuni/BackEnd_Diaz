@@ -62,6 +62,10 @@ socketServer.on('connection', (socket) => {
   socket.on("saludo", data => {
     console.log(data);
   });
+
+  socket.on("cart", data => {
+    console.log(data);
+  });
   
   socket.on('message', async (data) => {
     console.log(`Received data: ${data}`);

@@ -7,7 +7,6 @@ const getCartById = async (cid) => {
   return cartFound;
 };
 
-
 const addCart = async (body) => cartModel.create(body);
 
 const updateCart = async (cid, update) => {

@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getCartById } from "../Dao/DB/carts.service.js";
 import { getProducts, getProductsByParams } from "../Dao/DB/products.service.js";
 import ProductManager from "../ProductManager.js";
 
@@ -22,5 +23,20 @@ router.get('/products', async (req,res) => {
 
     res.render('productsview',{products: products});
 })
+
+//Esto es para mostrar los productos de un carrito
+router.get('/carts/:cid', async (req, res) => {
+    try {
+      const cid = req.params.cid;
+      const cart = await getCartById(cid);
+      const products = cart.products;
+  
+      res.render('cart', { cid, products });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send('Error interno del servidor');
+    }
+});
+  
 
 export default router;

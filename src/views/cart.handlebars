@@ -1,0 +1,28 @@
+<h1>Carrito {{cid}}</h1>
+
+{{#if products.length}}
+  <table>
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Precio unitario</th>
+        <th>Precio total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each products}}
+        <tr>
+          <td>{{this.product.title}}</td>
+          <td>{{this.quantity}}</td>
+          <td>{{this.product.price}}</td>
+          <td>{{this.product.stock}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{else}}
+  <p>No hay productos en el carrito.</p>
+{{/if}}
+
+<script src="/socket.io/socket.io.js"></script>
