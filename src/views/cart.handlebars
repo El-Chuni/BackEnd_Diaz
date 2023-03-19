@@ -7,18 +7,16 @@
         <th>Producto</th>
         <th>Cantidad</th>
         <th>Precio unitario</th>
-        <th>Precio total</th>
       </tr>
     </thead>
     <tbody>
-      {{#each products}}
-        <tr>
-          <td>{{this.product.title}}</td>
-          <td>{{this.quantity}}</td>
-          <td>{{this.product.price}}</td>
-          <td>{{this.product.stock}}</td>
-        </tr>
-      {{/each}}
+        {{#each products}}
+          <tr>
+            <td>{{title}}</td>
+            <td>{{quantity}}</td>
+            <td>{{price}}</td>
+          </tr>
+        {{/each}}
     </tbody>
   </table>
 {{else}}

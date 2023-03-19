@@ -29,8 +29,15 @@ router.get('/carts/:cid', async (req, res) => {
     try {
       const cid = req.params.cid;
       const cart = await getCartById(cid);
-      const products = cart.products;
-  
+      const products = cart.products.map(p => {
+        return {
+          title: p.product.title,
+          quantity: p.quantity,
+          price: p.product.price,
+          stock: p.product.stock
+        };
+      });
+      
       res.render('cart', { cid, products });
     } catch (error) {
       console.log(error);
