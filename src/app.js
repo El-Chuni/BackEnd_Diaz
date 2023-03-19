@@ -9,6 +9,7 @@ import chatRouter from './routes/chat.router.js';
 import __dirname from './utils.js';
 import { Server } from 'socket.io';
 import { getMessages, addMessage } from './Dao/DB/messages.service.js';
+import { getProductsByParams } from './Dao/DB/products.service.js';
 
 
 //Se hace lo necesario para activar el server
@@ -48,6 +49,14 @@ socketServer.on('connection', (socket) => {
   socket.on('views', (data) => {
     console.log(`Received data: ${data}`);
     socketServer.emit('updateViews', { products: productManager.getProducts() });
+  });
+
+  socket.on('productsview', async (data) => {
+    console.log(`Received data: ${data}`);
+
+    let products = await getProductsByParams();
+    console.log(products.payload);
+    socketServer.emit('productList', { products: products.payload});
   });
 
   socket.on("saludo", data => {
