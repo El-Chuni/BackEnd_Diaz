@@ -29,12 +29,14 @@ router.get('/carts/:cid', async (req, res) => {
     try {
       const cid = req.params.cid;
       const cart = await getCartById(cid);
+      //Debido a un extraño error de handlebars, paso los productos de esta forma:
       const products = cart.products.map(p => {
         return {
           title: p.product.title,
           quantity: p.quantity,
           price: p.product.price,
-          stock: p.product.stock
+          stock: p.product.stock,
+          total: (p.quantity * p.product.price)
         };
       });
       
