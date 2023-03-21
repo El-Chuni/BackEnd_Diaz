@@ -16,16 +16,17 @@ router.get('/', (req,res) => {
 
 //Esta es para mostrar los productos con mongoDB pero extendido
 //Originalmente e planeaba usar cierta función de service (que de hecho funciona)
-//pero su estructura no funcionaba acá, así que un paginate directo.
+//pero su estructura no funcionaba acá porque Handlebars no lo leía, así que
+//hice un paginate directo.
 router.get('/products', async (req,res) => {
   let page = parseInt(req.query.page);
   if(!page) page=1;
 
-  let contenido = await productModel.paginate({},{page,limit:10,lean:true});
-  contenido.prevLink = contenido.hasPrevPage?`http://localhost:9090/products?page=${contenido.prevPage}`:'';
-  contenido.nextLink = contenido.hasNextPage?`http://localhost:9090/products?page=${contenido.nextPage}`:'';
-  contenido.isValid= !(page<=0||page>contenido.totalPages);
-  res.render('productsview',contenido)
+  let content = await productModel.paginate({},{page,limit:10,lean:true});
+  content.prevLink = content.hasPrevPage?`http://localhost:9090/products?page=${content.prevPage}`:'';
+  content.nextLink = content.hasNextPage?`http://localhost:9090/products?page=${content.nextPage}`:'';
+  content.isValid= !(page<=0||page>content.totalPages);
+  res.render('productsview',content)
   
 });
 
