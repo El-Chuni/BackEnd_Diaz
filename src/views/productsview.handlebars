@@ -1,14 +1,27 @@
 <div id="productsList">
-  {{#each products}}
-    <div class="product">
-        <div>
-            <p>Nombre: {{this.title}}</p>
-            <p>Precio: {{this.price}}</p>
-            <p>Categoría: {{this.category}}</p>
-            <button>Agregar al carrito</button>
-        </div>
-    </div>
-  {{/each}}
+  {{#if products.length}}
+    {{#each products}}
+      <div class="product">
+          <div>
+              <p>Nombre: {{this.title}}</p>
+              <p>Precio: {{this.price}}</p>
+              <p>Categoría: {{this.category}}</p>
+              <button>Agregar al carrito</button>
+          </div>
+      </div>
+    {{/each}}
+    <div>
+      {{#if totalPages}}
+        {{#if prevPage}}
+          <a href="?page={{prevPage}}"><< Anterior</a>
+        {{/if}}
+        {{#if nextPage}}
+          <a href="?page={{nextPage}}">Siguiente >></a>
+        {{/if}}
+      {{/if}}
+    </div>    
+  {{else}}
+    <h1>No hay productos para mostrar</h1>
+  {{/if}}
 </div>
 <script src="/socket.io/socket.io.js"></script>
-<script src="/js/productsview.js"></script>
