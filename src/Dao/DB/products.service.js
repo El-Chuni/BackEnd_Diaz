@@ -28,11 +28,6 @@ const getProductsByParams = async (limit, page, query, sort) => {
   };
 }
 
-const countProductsByParams = async (query) => {
-  const count = await productModel.countDocuments(query);
-  return count;
-} 
-
 const addProduct = async (body) => productModel.create(body);
 
 const updateProduct = async (pid, update) => productModel.findOneAndUpdate({id: pid}, update);
@@ -46,4 +41,4 @@ const deleteProduct = async (pid) => {
   }
 }
   
-export { getProducts, getProductById, getProductsByParams, countProductsByParams, addProduct, updateProduct, deleteProduct }
+export { getProducts, getProductById, getProductsByParams, addProduct, updateProduct, deleteProduct }

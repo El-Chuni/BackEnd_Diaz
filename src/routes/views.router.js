@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getCartById } from "../Dao/DB/carts.service.js";
-import { getProducts, getProductsByParams, countProductsByParams } from "../Dao/DB/products.service.js";
+import { productModel } from "../Dao/DB/models/products.js";
+import { getProducts, getProductsByParams} from "../Dao/DB/products.service.js";
 import ProductManager from "../ProductManager.js";
 
 
@@ -14,28 +15,18 @@ router.get('/', (req,res) => {
 })
 
 //Esta es para mostrar los productos con mongoDB pero extendido
+//Originalmente e planeaba usar cierta función de service (que de hecho funciona)
+//pero su estructura no funcionaba acá, así que un paginate directo.
 router.get('/products', async (req,res) => {
-  let limit = parseInt(req.query.limit);
   let page = parseInt(req.query.page);
-  let query = req.query.query || ''; //Si no recibe query, el valor predeterminado es un string vacío así no clasifica nada
-  let sort = req.query.sort || null; //Si no recibe sort, el valor se vuelve nulo y no se cuenta
-  let products = await getProductsByParams(limit, page, query, sort);
+  if(!page) page=1;
 
-  //Calcula el número total de productos y de páginas
-  const count = await countProductsByParams(query);
-  const totalPages = Math.ceil(count / limit);
-
-  //Calcular los números de página previa y siguiente
-  const prevPage = (page > 1) ? page - 1 : null;
-  const nextPage = (page < totalPages) ? page + 1 : null;
-
-  // Renderizar la vista con la información de los productos y la paginación
-  res.render('productsview', {
-    products: products,
-    totalPages: totalPages,
-    prevPage: prevPage,
-    nextPage: nextPage
-  });
+  let contenido = await productModel.paginate({},{page,limit:10,lean:true});
+  contenido.prevLink = contenido.hasPrevPage?`http://localhost:9090/products?page=${contenido.prevPage}`:'';
+  contenido.nextLink = contenido.hasNextPage?`http://localhost:9090/products?page=${contenido.nextPage}`:'';
+  contenido.isValid= !(page<=0||page>contenido.totalPages);
+  res.render('productsview',contenido)
+  
 });
 
 

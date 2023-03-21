@@ -1,27 +1,33 @@
-<div id="productsList">
-  {{#if products.length}}
-    {{#each products}}
-      <div class="product">
-          <div>
-              <p>Nombre: {{this.title}}</p>
-              <p>Precio: {{this.price}}</p>
-              <p>Categoría: {{this.category}}</p>
-              <button>Agregar al carrito</button>
-          </div>
-      </div>
-    {{/each}}
-    <div>
-      {{#if totalPages}}
-        {{#if prevPage}}
-          <a href="?page={{prevPage}}"><< Anterior</a>
-        {{/if}}
-        {{#if nextPage}}
-          <a href="?page={{nextPage}}">Siguiente >></a>
-        {{/if}}
-      {{/if}}
-    </div>    
-  {{else}}
-    <h1>No hay productos para mostrar</h1>
-  {{/if}}
+
+{{#if isValid}}
+<div>
+  {{#each docs}}
+    <div class="product">
+        <div>
+            <h4>{{this.title}}</h4>
+            <p>Precio: ${{this.price}} ARG</p>
+            <p>Descripción: {{this.description}}</p>
+            <p>Stock actual: {{this.stock}}</p>
+            <p>Categoría: {{this.category}}</p>
+            <button>Agregar al carrito</button>
+        </div>
+    </div>
+    <br/>
+  {{/each}}
 </div>
-<script src="/socket.io/socket.io.js"></script>
+<br/>
+<div>
+  {{#if hasPrevPage}}
+      <a href={{this.prevLink}}><< Anterior</a>
+  {{/if}}
+    &nbsp;
+  {{this.page}}
+    &nbsp;
+    {{#if hasNextPage}}
+      <a href={{this.nextLink}}>Siguiente >></a>
+  {{/if}}
+</div>   
+{{else}}
+  <h1>No hay productos para mostrar</h1>
+{{/if}}
+
