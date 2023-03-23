@@ -6,10 +6,13 @@ import productsRouter from './routes/products.router.js';
 import cartsRouter from './routes/carts.router.js';
 import viewsRouter from './routes/views.router.js';
 import chatRouter from './routes/chat.router.js';
+import userRouter from './routes/user.router.js';
 import __dirname from './utils.js';
 import { Server } from 'socket.io';
+import session from 'express-session';
 import { getMessages, addMessage } from './Dao/DB/messages.service.js';
 import { getProductsByParams } from './Dao/DB/products.service.js';
+import MongoStore from 'connect-mongo';
 
 
 //Se hace lo necesario para activar el server
@@ -39,8 +42,20 @@ app.use(express.static(__dirname+'/public'))
 
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
-app.use('/realtimeproducts', viewsRouter);
-app.use('/api/chat', chatRouter)
+app.use('/views', viewsRouter);
+app.use('/api/chat', chatRouter);
+app.use('/api/user', userRouter);
+
+app.use(session({
+  store:MongoStore.create({
+    mongoUrl:"mongodb+srv://TestMongo:Gvy7CjhQf9zlMSgo@cluster0.lg3tyb6.mongodb.net/?retryWrites=true&w=majority",
+    mongoOptions:{useNewUrlParser: true, useUnifiedTopology: true},
+    ttl:15
+  }),
+  secret: 'backEndCoder',
+  resave: true,
+  saveUninitialized:true
+}));
 
 //Se inicia el Websocket server
 socketServer.on('connection', (socket) => {
@@ -123,4 +138,12 @@ app.get('/products/:pid', (req, res) => {
   res.send(productFound || {});
 });
 
-
+app.get('/session', (req, res) => {
+  if(req.session.counter){
+    req.session.counter++;
+    res.send(`Entraste ${req.session.counter} veces.`)
+  }else{
+    req.session.counter = 1;
+    res.send('¡Bienvenido a tu primer visita!')
+  }
+})
