@@ -5,7 +5,7 @@ form.addEventListener('submit',e=>{
     const data = new FormData(form);
     const obj = {};
     data.forEach((value,key)=>obj[key]=value);
-    fetch('/api/user/login',{
+    fetch('/api/user/post/login',{
         method:'POST',
         body:JSON.stringify(obj),
         headers:{
@@ -13,7 +13,7 @@ form.addEventListener('submit',e=>{
         }
     }).then(result=>{
         if(result.status===200){
-            window.location.replace('/users');
+            window.location.replace('/api/user');
         }
     })
 })

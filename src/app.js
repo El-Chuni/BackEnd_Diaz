@@ -40,12 +40,6 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(__dirname+'/public'))
 
-app.use('/api/products', productsRouter);
-app.use('/api/carts', cartsRouter);
-app.use('/views', viewsRouter);
-app.use('/api/chat', chatRouter);
-app.use('/api/user', userRouter);
-
 app.use(session({
   store:MongoStore.create({
     mongoUrl:"mongodb+srv://TestMongo:Gvy7CjhQf9zlMSgo@cluster0.lg3tyb6.mongodb.net/?retryWrites=true&w=majority",
@@ -56,6 +50,12 @@ app.use(session({
   resave: true,
   saveUninitialized:true
 }));
+
+app.use('/api/products', productsRouter);
+app.use('/api/carts', cartsRouter);
+app.use('/views', viewsRouter);
+app.use('/api/chat', chatRouter);
+app.use('/api/user', userRouter);
 
 //Se inicia el Websocket server
 socketServer.on('connection', (socket) => {

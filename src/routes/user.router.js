@@ -4,7 +4,7 @@ import userModel from "../Dao/DB/models/user.js";
 const router = Router();
 
 //Registramos al usuario
-router.post("/register", async (req, res)=>{
+router.post("/post/register", async (req, res)=>{
     const { first_name, last_name, email, age, password} = req.body;
     console.log("Registrando usuario:");
     console.log(req.body);
@@ -24,8 +24,15 @@ router.post("/register", async (req, res)=>{
     res.status(201).send({status: "success", message: "Usuario creado con extito con ID: " + result.id});
 });
 
+
+  
+router.get("/register", (req, res) => {
+    res.render("register");
+});
+  
+  
 //Ingresa el usuario
-router.post("/login", async (req, res)=>{
+router.post("/post/login", async (req, res)=>{
     const {email, password} = req.body;
     const user = await userModel.findOne({email,password});
     if(!user) return res.status(401).send({status:"error",error:"Incorrect credentials"});
@@ -36,5 +43,17 @@ router.post("/login", async (req, res)=>{
     }
     res.send({status:"success", payload:req.session.user, message:"¡Primer logueo realizado! :)" });
 });
+
+router.get("/login", (req, res) => {
+    res.render("login");
+});
+
+//Muestra el usuario y algunos datos
+router.get("/", (req, res) =>{
+    res.render("profile", {
+        user: req.session.user
+    });
+});
+
 
 export default router;
