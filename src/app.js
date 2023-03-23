@@ -50,7 +50,7 @@ app.use(session({
   store:MongoStore.create({
     mongoUrl:"mongodb+srv://TestMongo:Gvy7CjhQf9zlMSgo@cluster0.lg3tyb6.mongodb.net/?retryWrites=true&w=majority",
     mongoOptions:{useNewUrlParser: true, useUnifiedTopology: true},
-    ttl:15
+    ttl:60
   }),
   secret: 'backEndCoder',
   resave: true,
