@@ -1,5 +1,9 @@
-
 {{#if isValid}}
+{{#if user}}
+  <div>
+    <p>Bienvenido, {{user.role}} {{user.name}}.</p>
+  </div>
+{{/if}}
 <div>
   {{#each docs}}
     <div class="product">

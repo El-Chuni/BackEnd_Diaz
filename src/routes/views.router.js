@@ -26,8 +26,8 @@ router.get('/products', async (req,res) => {
   content.prevLink = content.hasPrevPage?`http://localhost:9090/products?page=${content.prevPage}`:'';
   content.nextLink = content.hasNextPage?`http://localhost:9090/products?page=${content.nextPage}`:'';
   content.isValid= !(page<=0||page>content.totalPages);
-  res.render('productsview',content)
-  
+
+  res.render('productsview',{...content, user: req.session.user})
 });
 
 
