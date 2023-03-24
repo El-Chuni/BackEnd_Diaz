@@ -8,6 +8,10 @@ form.addEventListener('submit',e=>{
     data.forEach((value,key)=>obj[key]=value);
     console.log("Objeto formado:");
     console.log(obj);
+    //Se chequea si se registra cierto usuario para darle rol de admin
+    if (obj.email == "adminCoder@coder.com" || obj.password == "adminCod3r123"){
+        obj.role = "admin";
+    }
     fetch('/api/user/post/register',{
         method:'POST',
         body:JSON.stringify(obj),

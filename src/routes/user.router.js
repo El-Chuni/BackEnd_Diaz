@@ -5,7 +5,7 @@ const router = Router();
 
 //Registramos al usuario
 router.post("/post/register", async (req, res)=>{
-    const { first_name, last_name, email, age, password} = req.body;
+    const { first_name, last_name, email, age, password, role} = req.body;
     console.log("Registrando usuario:");
     console.log(req.body);
 
@@ -18,7 +18,8 @@ router.post("/post/register", async (req, res)=>{
         last_name,
         email,
         age,
-        password
+        password,
+        role
     };
     const result = await userModel.create(user);
     res.status(201).send({status: "success", message: "Usuario creado con extito con ID: " + result.id});
@@ -52,6 +53,16 @@ router.get("/login", (req, res) => {
 router.get("/", (req, res) =>{
     res.render("profile", {
         user: req.session.user
+    });
+});
+
+//Se acaba la sessión
+router.get("/logout", (req, res) => {
+    req.session.destroy(error => {
+        if (error){
+            res.json({error: "error logout", mensaje: "Error al cerrar la sesion"});
+        }
+        res.render("login");
     });
 });
 
