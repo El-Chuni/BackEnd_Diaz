@@ -1,5 +1,6 @@
 import { Router } from "express";
 import userModel from "../Dao/DB/models/user.js";
+import { createHash, isValidPassword } from "../utils.js";
 
 const router = Router();
 
@@ -18,7 +19,7 @@ router.post("/post/register", async (req, res)=>{
         last_name,
         email,
         age,
-        password,
+        password:createHash(password),
         role
     };
     const result = await userModel.create(user);
@@ -35,8 +36,10 @@ router.get("/register", (req, res) => {
 //Ingresa el usuario
 router.post("/post/login", async (req, res)=>{
     const {email, password} = req.body;
-    const user = await userModel.findOne({email,password});
+    const user = await userModel.findOne({email});
     if(!user) return res.status(401).send({status:"error",error:"Incorrect credentials"});
+    if(!isValidPassword(user,password)) return res.status(403).send({status:"error",error:"Incorrect password"});
+    delete user.password;
     req.session.user= {
         name : `${user.first_name} ${user.last_name}`,
         email: user.email,
@@ -55,6 +58,18 @@ router.get("/", (req, res) =>{
         user: req.session.user
     });
 });
+
+/*router.("/callback", (req, res) =>{
+    res.render("profile", {
+        user: req.session.user
+    });
+});*/
+
+/*router.("/github", (req, res) =>{
+    res.render("profile", {
+        user: req.session.user
+    });
+});*/
 
 //Se acaba la sessión
 router.get("/logout", (req, res) => {

@@ -13,6 +13,8 @@ import session from 'express-session';
 import { getMessages, addMessage } from './Dao/DB/messages.service.js';
 import { getProductsByParams } from './Dao/DB/products.service.js';
 import MongoStore from 'connect-mongo';
+import passport from 'passport';
+import initializePassport from './config/passport.config.js';
 
 
 //Se hace lo necesario para activar el server
@@ -50,6 +52,10 @@ app.use(session({
   resave: true,
   saveUninitialized:true
 }));
+
+//Se inicia el pasaporte
+initializePassport();
+app.use(passport.initialize());
 
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
