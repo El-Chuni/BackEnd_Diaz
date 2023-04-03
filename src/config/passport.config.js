@@ -62,6 +62,7 @@ const initializePassport = () => {
                     email,
                     age,
                     password : createHash(password),
+                    role,
                     loggedBy: "App"
                 };
                 const result = await userModel.create(user);

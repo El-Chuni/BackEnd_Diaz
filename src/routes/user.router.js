@@ -1,12 +1,13 @@
 import { Router } from "express";
+import passport from "passport";
 import userModel from "../Dao/DB/models/user.js";
 import { createHash, isValidPassword } from "../utils.js";
 
 const router = Router();
 
 //Registramos al usuario
-router.post("/post/register", async (req, res)=>{
-    const { first_name, last_name, email, age, password, role} = req.body;
+router.post("/post/register", passport.authenticate('register',{failureRedirect:'/failregister'}), async (req, res)=>{
+    /*const { first_name, last_name, email, age, password, role} = req.body;
     console.log("Registrando usuario:");
     console.log(req.body);
 
@@ -22,7 +23,7 @@ router.post("/post/register", async (req, res)=>{
         password:createHash(password),
         role
     };
-    const result = await userModel.create(user);
+    const result = await userModel.create(user);*/
     res.status(201).send({status: "success", message: "Usuario creado con extito con ID: " + result.id});
 });
 
@@ -31,14 +32,19 @@ router.post("/post/register", async (req, res)=>{
 router.get("/register", (req, res) => {
     res.render("register");
 });
+
+router.get("/failregister", (req, res) => {
+    console.log("Auth failed.");
+    res.send({error:"Auth failed."});
+});
   
   
 //Ingresa el usuario
-router.post("/post/login", async (req, res)=>{
-    const {email, password} = req.body;
+router.post("/post/login", passport.authenticate('login',{failureRedirect:'/faillogin'}), async (req, res)=>{
+    /*const {email, password} = req.body;
     const user = await userModel.findOne({email});
     if(!user) return res.status(401).send({status:"error",error:"Incorrect credentials"});
-    if(!isValidPassword(user,password)) return res.status(403).send({status:"error",error:"Incorrect password"});
+    if(!isValidPassword(user,password)) return res.status(403).send({status:"error",error:"Incorrect password"});*/
     delete user.password;
     req.session.user= {
         name : `${user.first_name} ${user.last_name}`,
@@ -50,6 +56,10 @@ router.post("/post/login", async (req, res)=>{
 
 router.get("/login", (req, res) => {
     res.render("login");
+});
+
+router.get("/faillogin", (req, res) => {
+    res.send({error:"Failed login"});
 });
 
 //Muestra el usuario y algunos datos
