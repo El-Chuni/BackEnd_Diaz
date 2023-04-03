@@ -62,24 +62,19 @@ router.get("/faillogin", (req, res) => {
     res.send({error:"Failed login"});
 });
 
+router.get("/github", passport.authenticate('github', {scope:['user:email']}), async (req, res) =>{});
+
+router.get("/callback", passport.authenticate('github', {failureRedirect:'/login'}), async (req, res) =>{
+    req.session.user = req.user;
+    res.redirect('/');
+});
+
 //Muestra el usuario y algunos datos
 router.get("/", (req, res) =>{
     res.render("profile", {
         user: req.session.user
     });
 });
-
-/*router.("/callback", (req, res) =>{
-    res.render("profile", {
-        user: req.session.user
-    });
-});*/
-
-/*router.("/github", (req, res) =>{
-    res.render("profile", {
-        user: req.session.user
-    });
-});*/
 
 //Se acaba la sessión
 router.get("/logout", (req, res) => {

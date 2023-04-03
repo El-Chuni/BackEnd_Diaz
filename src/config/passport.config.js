@@ -2,7 +2,7 @@ import passport from "passport";
 import passportLocal from 'passport-local';
 import GitHubStrategy from 'passport-github2';
 import userModel from "../Dao/DB/models/user.js";
-import { createHash, isValidPassword } from "../utils";
+import { createHash, isValidPassword } from "../utils.js";
 
 //Declaramos nuestra estrategia:
 const localStrategy = passportLocal.Strategy;
@@ -33,7 +33,8 @@ const initializePassport = () => {
                         age: 18,
                         email: profile._json.email,
                         password: '',
-                        loggedBy: "GitHub"
+                        loggedBy: "GitHub",
+                        role: 'user'
                     };
                     const result = await userModel.create(newUser);
                     return done(null, result);
