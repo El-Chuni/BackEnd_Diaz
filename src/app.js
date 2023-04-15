@@ -7,6 +7,7 @@ import cartsRouter from './routes/carts.router.js';
 import viewsRouter from './routes/views.router.js';
 import chatRouter from './routes/chat.router.js';
 import userRouter from './routes/user.router.js';
+import sessionRouter from './routes/session.router.js';
 import __dirname from './utils.js';
 import { Server } from 'socket.io';
 import session from 'express-session';
@@ -62,6 +63,7 @@ app.use('/api/carts', cartsRouter);
 app.use('/views', viewsRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/user', userRouter);
+app.use('/api/sessions', sessionRouter);
 
 //Se inicia el Websocket server
 socketServer.on('connection', (socket) => {

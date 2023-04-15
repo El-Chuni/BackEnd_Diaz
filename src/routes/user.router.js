@@ -7,24 +7,7 @@ const router = Router();
 
 //Registramos al usuario
 router.post("/post/register", passport.authenticate('register',{failureRedirect:'/failregister'}), async (req, res)=>{
-    /*const { first_name, last_name, email, age, password, role} = req.body;
-    console.log("Registrando usuario:");
-    console.log(req.body);
-
-    const exists = await userModel.findOne({email});
-    if (exists){
-        return res.status(400).send({status: "error", message: "Usuario ya existe."});
-    }
-    const user = {
-        first_name,
-        last_name,
-        email,
-        age,
-        password:createHash(password),
-        role
-    };
-    const result = await userModel.create(user);*/
-    res.status(201).send({status: "success", message: "Usuario creado con extito con ID: " + result.id});
+    res.status(201).send({status: "success", message: "Usuario creado con extito con ID: " + req.user.id});
 });
 
 
@@ -41,10 +24,7 @@ router.get("/failregister", (req, res) => {
   
 //Ingresa el usuario
 router.post("/post/login", passport.authenticate('login',{failureRedirect:'/faillogin'}), async (req, res)=>{
-    /*const {email, password} = req.body;
-    const user = await userModel.findOne({email});
-    if(!user) return res.status(401).send({status:"error",error:"Incorrect credentials"});
-    if(!isValidPassword(user,password)) return res.status(403).send({status:"error",error:"Incorrect password"});*/
+    const user = req.user;
     delete user.password;
     req.session.user= {
         name : `${user.first_name} ${user.last_name}`,

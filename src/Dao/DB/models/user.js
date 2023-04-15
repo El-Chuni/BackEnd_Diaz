@@ -10,10 +10,12 @@ const schema = new mongoose.Schema({
         unique: true
     },
     age:Number,
-    password:String, //Se deja plano por el momento.
+    password:String,
+    cart: String,
     role:{
         type: String,
-        default: "usuario"
+        default: "usuario",
+        enum: ["usuario", "admin"]
     }
 })
 

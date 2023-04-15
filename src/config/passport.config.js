@@ -51,11 +51,15 @@ const initializePassport = () => {
     passport.use('register', new localStrategy(
         {passReqToCallback: true, usernameField: 'email'}, async (req, username, password, done) => {
             const {first_name, last_name, email, age} = req.body;
+            let role = "user";
             try {
                 const exists = await userModel.findOne({email});
                 if (exists){
                     console.log("El usuario ya existe.");
                     return done(null, false);
+                };
+                if (email == "soyadmin" && password == "admin"){
+                    role = "admin";
                 }
                 const user = {
                     first_name,
