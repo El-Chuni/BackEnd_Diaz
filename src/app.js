@@ -15,12 +15,13 @@ import { getMessages, addMessage } from './Dao/DB/messages.service.js';
 import { getProductsByParams } from './Dao/DB/products.service.js';
 import MongoStore from 'connect-mongo';
 import passport from 'passport';
+import config from './config/config.js';
 import initializePassport from './config/passport.config.js';
 
 
 //Se hace lo necesario para activar el server
 const app = express();
-const SERVER_PORT = 8080;
+const SERVER_PORT = config.port;
 
 const server = app.listen(SERVER_PORT, () => {
   console.log(`No abran cualquier cosa en el server numero ${SERVER_PORT}.`);
@@ -45,7 +46,7 @@ app.use(express.static(__dirname+'/public'))
 
 app.use(session({
   store:MongoStore.create({
-    mongoUrl:"mongodb+srv://TestMongo:Gvy7CjhQf9zlMSgo@cluster0.lg3tyb6.mongodb.net/?retryWrites=true&w=majority",
+    mongoUrl: config.mongoUrl,
     mongoOptions:{useNewUrlParser: true, useUnifiedTopology: true},
     ttl:60
   }),
@@ -104,7 +105,7 @@ const connectMongoDB = async ()=>{
   try {
       //Usuario: TestMongo
       //Contraseña: Gvy7CjhQf9zlMSgo
-      await mongoose.connect('mongodb+srv://TestMongo:Gvy7CjhQf9zlMSgo@cluster0.lg3tyb6.mongodb.net/ecommerce');
+      await mongoose.connect(config.mongoUrl);
       console.log("Conectado con exito a MongoDB usando Moongose.");
   } catch (error) {
       console.error("No se pudo conectar a la BD usando Moongose: " + error);
