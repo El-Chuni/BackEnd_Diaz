@@ -11,14 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.0",
-    "commander": "^10.0.1",
     "connect-mongo": "^5.0.0",
     "cookie-parser": "^1.4.6",
-<<<<<<< HEAD
     "commander": "^10.0.0",
-=======
-    "cors": "^2.8.5",
->>>>>>> c938ca6f2572d9668ab63eaf2948481fea172323
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-handlebars": "^6.0.7",
