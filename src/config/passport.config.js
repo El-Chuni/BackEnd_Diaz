@@ -3,6 +3,7 @@ import passportLocal from 'passport-local';
 import GitHubStrategy from 'passport-github2';
 import userModel from "../Dao/DB/models/user.js";
 import { createHash, isValidPassword } from "../utils.js";
+import config from "./config.js"
 
 //Declaramos nuestra estrategia:
 const localStrategy = passportLocal.Strategy;
@@ -100,6 +101,19 @@ const initializePassport = () => {
             }
         })
     );
+
+    passport.use('onlyAdmin',new LocalStrategy({usernameField: 'username'},
+      async (username, password, done) => {
+        if (username == config.adminName) {
+            //Se confirma que es admin y permite el acceso
+            return done(null, config.adminName);
+        }else{
+            //Caso contrario.
+            console.warn("Access denied, only admin can use this.")
+            return done(null, false);
+        }
+      }
+    ));
 
     //Funciones de Serializacion y Desserializacion
     passport.serializeUser((user, done) => {

@@ -1,6 +1,8 @@
 import { Router } from "express";
 import multer from "multer";
-import ProductManager, {Product} from "../ProductManager.js";
+import passport from "passport";
+//import ProductManager, {Product} from "../ProductManager.js";
+import ProductManager from "../Dao/FileSystem/products.service.js";
 import { addProduct, deleteProduct, getProductById, getProducts, getProductsByParams, updateProduct } from "../Dao/DB/products.service.js";
 
 //Se define el router
@@ -34,6 +36,11 @@ router.get('/', async (req,res) => {
     res.render('home', {products: products})
 })
 
+//Un aviso si la autentificación falla en ciertas funciones
+router.get('/forbidden', async (req,res) => {
+    res.send("No estás autorizado para ejecutar cambios acá.")
+})
+
 
 //Carga y muestra un producto en particular
 router.get('/get/:pid', async (req, res) => {
@@ -47,22 +54,20 @@ router.get('/get/:pid', async (req, res) => {
 })
 
 //Añade un producto al array
-router.post('/post', upload.array(), async (req,res) => {
+router.post('/post', passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), upload.array(), async (req, res) => {
     const product = req.body;
     try {
-        await addProduct(product);
-        
-        let products = await getProducts();
-        res.send(products)
+      await addProduct(product);
+      
+      let products = await getProducts();
+      res.send(products)
     } catch (error) {
-        res.status(400).send({status: "Error", message: error.message});
+      res.status(400).send({status: "Error", message: error.message});
     };
-
-    
-})
-
+  });
+  
 //Se borra un producto especifico por ID
-router.delete('/delete/:pid', async (req,res) => {
+router.delete('/delete/:pid', passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), async (req,res) => {
     let pid = parseInt(req.params.pid);
 
     //Se verifica si existe y lo borra, sino manda error.
@@ -75,7 +80,7 @@ router.delete('/delete/:pid', async (req,res) => {
 })
 
 //Se actualiza un producto por ID
-router.put('/put/:pid', upload.array(), async (req,res) =>{
+router.put('/put/:pid', passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), upload.array(), async (req,res) =>{
     let pid = parseInt(req.params.pid);
     let productUpdate = req.body;
 
@@ -120,7 +125,7 @@ router.get('/fs/get/:pid', (req, res) => {
 })
 
 //Añade un producto al array
-router.post('/fs/post', upload.array(), (req,res) => {
+router.post('/fs/post', passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), upload.array(), (req,res) => {
     const product = req.body;
     try {
         productManager.addProduct(product);
@@ -135,7 +140,7 @@ router.post('/fs/post', upload.array(), (req,res) => {
 })
 
 //Se borra un producto especifico por ID
-router.delete('/fs/delete/:pid', (req,res) => {
+router.delete('/fs/delete/:pid', passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), (req,res) => {
     let pid = parseInt(req.params.pid);
 
     //Se verifica si existe y lo borra, sino manda error.
@@ -148,7 +153,7 @@ router.delete('/fs/delete/:pid', (req,res) => {
 })
 
 //Se actualiza un producto por ID
-router.put('/fs/put/:pid', upload.array(), (req,res) =>{
+router.put('/fs/put/:pid', passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), upload.array(), (req,res) =>{
     let pid = parseInt(req.params.pid);
     let productUpdate = req.body;
 
