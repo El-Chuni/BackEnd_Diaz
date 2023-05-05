@@ -1,5 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
+import config from "../config/config.js";
 import passport from "passport";
 //import ProductManager, {Product} from "../ProductManager.js";
 import ProductManager from "../Dao/FileSystem/products.service.js";
@@ -18,16 +19,18 @@ const upload = multer({ storage });
 
 //Carga y muestra los productos
 router.get('/get', async (req,res) => {
-    let limit = parseInt(req.query.limit);
-    let page = parseInt(req.query.page);
-    let query = req.query.query || ''; //Si no recibe query, el valor predeterminado es un string vacío así no clasifica nada
-    let sort = req.query.sort || null; //Si no recibe sort, el valor se vuelve nulo y no se cuenta
+    if (!config.useFS) {
+        let limit = parseInt(req.query.limit);
+        let page = parseInt(req.query.page);
+        let query = req.query.query || ''; //Si no recibe query, el valor predeterminado es un string vacío así no clasifica nada
+        let sort = req.query.sort || null; //Si no recibe sort, el valor se vuelve nulo y no se cuenta
     
-    console.log("Loading products...");
+        console.log("Loading products...");
     
-    let products = await getProductsByParams(limit, page, query, sort);
-    console.log(products);
-    products ? res.send(products) : res.status(404).send({status: "Error", message: "No se encontraron productos"});
+        let products = await getProductsByParams(limit, page, query, sort);
+        console.log(products);
+        products ? res.send(products) : res.status(404).send({status: "Error", message: "No se encontraron productos"});
+    }
 })
 
 //Lo mismo que /get pero con socket.io

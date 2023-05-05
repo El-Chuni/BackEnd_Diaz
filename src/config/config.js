@@ -7,6 +7,7 @@ program
     .option('-d', 'Variable para debug', false)
     .option('-p <port>', 'Puerto del servidor', 8080)
     .option('--mode <mode>', 'Modo de trabajo', 'develop')
+    .option('--fs', 'Usar filesystem en lugar de MongoDB', false) // opción para usar fs
 program.parse();
 
 console.log("Mode Option: ", program.opts().mode);
@@ -27,5 +28,6 @@ export default {
     gmailAppPassword: process.env.GMAIL_APP_PASSWD, 
     twilioAccount: process.env.TWILIO_ACCOUNT_SID, 
     twilioAuthToken: process.env.TWILIO_AUTH_TOKEN, 
-    twilioSMSNumber: process.env.TWILIO_SMS_NUMBER
+    twilioSMSNumber: process.env.TWILIO_SMS_NUMBER,
+    useFS: program.opts().fs,
 };
