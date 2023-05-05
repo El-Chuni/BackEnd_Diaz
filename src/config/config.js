@@ -18,7 +18,7 @@ dotenv.config({
     path:environment==="production"?"./src/config/.env.production":"./src/config/.env.development"
 });
 
-
+//useFS define cual sistema de almacenamiento de datos uso
 export default {
     port: process.env.PORT,
     mongoUrl: process.env.MONGO_URL,

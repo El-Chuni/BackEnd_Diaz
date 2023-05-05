@@ -30,13 +30,19 @@ router.get('/get', async (req,res) => {
         let products = await getProductsByParams(limit, page, query, sort);
         console.log(products);
         products ? res.send(products) : res.status(404).send({status: "Error", message: "No se encontraron productos"});
+    }else{
+        res.send("Opción no disponible en FS.")
     }
 })
 
 //Lo mismo que /get pero con socket.io
 router.get('/', async (req,res) => {
-    let products = await getProducts();
-    res.render('home', {products: products})
+    if (!config.useFS) {
+        let products = await getProducts();
+        res.render('home', {products: products})
+    }else{
+        res.render('home',{products: productManager.getProducts()});
+    }
 })
 
 //Un aviso si la autentificación falla en ciertas funciones
@@ -48,7 +54,7 @@ router.get('/forbidden', async (req,res) => {
 //Carga y muestra un producto en particular
 router.get('/get/:pid', async (req, res) => {
     let pid = parseInt(req.params.pid);
-    let productFound = await getProductById(pid);
+    let productFound = config.useFS ? productManager.getProductById(pid) : await getProductById(pid);
     
     //Esta condicional pregunta si se encontró el producto en el array
     //Si se encontró, lo muestra.
@@ -60,12 +66,19 @@ router.get('/get/:pid', async (req, res) => {
 router.post('/post', passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), upload.array(), async (req, res) => {
     const product = req.body;
     try {
-      await addProduct(product);
+        if (!config.useFS){
+            await addProduct(product);
       
-      let products = await getProducts();
-      res.send(products)
+            let products = await getProducts();
+            res.send(products)
+        }else{
+            productManager.addProduct(product);
+            socket.emit('newProduct', { products: productManager.getProducts() });
+        
+            res.send(productManager.getProducts());
+        }
     } catch (error) {
-      res.status(400).send({status: "Error", message: error.message});
+        res.status(400).send({status: "Error", message: error.message});
     };
   });
   
@@ -75,7 +88,8 @@ router.delete('/delete/:pid', passport.authenticate('onlyAdmin', { failureRedire
 
     //Se verifica si existe y lo borra, sino manda error.
     try {
-        await deleteProduct(pid);
+        config.useFS ? productManager.deleteProduct(pid) : await deleteProduct(pid);
+ 
         res.send("Product deleted.");
     } catch (error) {
         res.status(404).send({status: "Error", message: error.message});
@@ -89,10 +103,17 @@ router.put('/put/:pid', passport.authenticate('onlyAdmin', { failureRedirect: '/
 
     //Se verifica su existencia y lo actualiza, sino avisa del error.
     try {
-        await updateProduct(pid, productUpdate)
+        if (!config.useFS){
+            await updateProduct(pid, productUpdate)
 
-        let products = await getProducts();
-        res.send(products)
+            let products = await getProducts();
+
+            res.send(products)
+        }else{
+            productManager.updateProduct(pid, productUpdate);
+
+            res.send(productManager.getProducts());
+        }
     } catch (error) {
         res.status(404).send({status: "Error", message: error.message});
     }
@@ -101,6 +122,9 @@ router.put('/put/:pid', passport.authenticate('onlyAdmin', { failureRedirect: '/
 //
 //Estas son versiones usando un filesystem en su lugar
 //
+
+//Update 3ra entrega: Estas funciones fueron incorporadas y fusionadas arriba.
+//Se conserva momentaneamente antes de decidir que hacer con las mismas.
 
 //Carga y muestra los productos
 router.get('/fs/get', (req,res) => {
