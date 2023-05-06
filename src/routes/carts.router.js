@@ -10,6 +10,11 @@ const router = Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+//Un aviso si la autentificación falla en ciertas funciones
+router.get('/forbidden', async (req,res) => {
+    res.send("No estás autorizado para ejecutar cambios acá.")
+})
+
 //Carga y muestra cada carrito
 router.get('/get', async (req,res) => {
     console.log("Loading carts...");
@@ -39,7 +44,7 @@ router.get('/get/:cid', async (req, res) => {
 })
 
 //Añade un carrito al array.
-router.post('/post', upload.array(), async (req,res) => {
+router.post('/post', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), upload.array(), async (req,res) => {
     let products = req.body; 
 
     try{
@@ -62,7 +67,7 @@ router.post('/post', upload.array(), async (req,res) => {
 })
 
 //Se añade un producto especifico a un carrito especifico.
-router.post('/post/:cid/product/:pid', async (req,res) => {
+router.post('/post/:cid/product/:pid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), async (req,res) => {
     let cid = req.params.cid;
     let pid = req.params.pid;
 
@@ -102,7 +107,7 @@ router.post('/post/:cid/product/:pid', async (req,res) => {
 })
 
 //Limpiamos el carrito y ponemos otros productos en su lugar
-router.put('/put/:cid', async (req, res) => {
+router.put('/put/:cid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), async (req, res) => {
     let cid = req.params.cid;
     let products = req.body; 
 
@@ -123,7 +128,7 @@ router.put('/put/:cid', async (req, res) => {
 })
 
 //Se actualiza el stock de un producto del carrito con el que le ingresamos
-router.put('/put/:cid/products/:pid', async (req, res) => {
+router.put('/put/:cid/products/:pid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), async (req, res) => {
     let cid = req.params.cid;
     let pid = req.params.pid;
     let stock = req.body;  
@@ -145,7 +150,7 @@ router.put('/put/:cid/products/:pid', async (req, res) => {
 })
 
 //Quitamos un producto del carrito (incluyendo su stock)
-router.delete('/delete/:cid/products/:pid', async (req, res) => {
+router.delete('/delete/:cid/products/:pid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), async (req, res) => {
     let cid = req.params.cid;
     let pid = req.params.pid;
 
@@ -166,7 +171,7 @@ router.delete('/delete/:cid/products/:pid', async (req, res) => {
 })
 
 //Quitamos el carrito, así de simple.
-router.delete('/delete/:cid', async (req, res) => {
+router.delete('/delete/:cid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), async (req, res) => {
     let cid = req.params.cid;
     
     try {

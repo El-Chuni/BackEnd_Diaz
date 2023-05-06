@@ -1,3 +1,4 @@
+import config from "../../config/config.js";
 const socket = io();
 socket.emit("saludo", "Hola, me estoy comunicando con un websocket!");
 
@@ -5,13 +6,13 @@ const input = document.getElementById('textoEntrada');
 const log = document.getElementById('log');
 
 input.addEventListener('keyup', async (evt) => {
-    if (evt.key === "Enter") {
-        const message = input.value;
-        const user = document.getElementById('nombreUsuario').value;
-        console.log(`Agregando mensaje: ${message} de ${user}`);
-        socket.emit('message', JSON.stringify({user, message}));
-        input.value = "";
-    }
+  if (evt.key === "Enter") {
+      const message = input.value;
+      const user = document.getElementById('nombreUsuario').value;
+      console.log(`Agregando mensaje: ${message} de ${user}`);
+      socket.emit('message', JSON.stringify({user, message}));
+      input.value = "";
+  }
 });
   
 socket.on('updateMessages', messages => {
