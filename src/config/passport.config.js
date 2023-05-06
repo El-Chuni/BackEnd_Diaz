@@ -102,14 +102,27 @@ const initializePassport = () => {
         })
     );
 
-    passport.use('onlyAdmin',new LocalStrategy({usernameField: 'username'},
-      async (username, password, done) => {
+    passport.use('onlyAdmin', new localStrategy({usernameField: 'username'},
+      async (username, done) => {
         if (username == config.adminName) {
             //Se confirma que es admin y permite el acceso
             return done(null, config.adminName);
         }else{
             //Caso contrario.
             console.warn("Access denied, only admin can use this.")
+            return done(null, false);
+        }
+      }
+    ));
+
+    passport.use('onlyUser',new localStrategy({usernameField: 'username'},
+      async (username, done) => {
+        if (username !== config.adminName) {
+            //Se confirma que es usuario y permite el acceso
+            return done(null, {username: username});
+        }else{
+            //Caso contrario.
+            console.warn("Access denied, only user can use this.")
             return done(null, false);
         }
       }

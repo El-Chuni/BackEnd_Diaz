@@ -58,4 +58,22 @@ export default class CartManager {
       return deletedCart;
     }
   }
+
+  static async updateProductStock(cartId, productId, newStock) {
+    const carts = await CartManager.getAllCarts();
+    const cartIndex = carts.findIndex(c => c.id === cartId);
+    if (cartIndex === -1) {
+      return null;
+    } else {
+      const products = carts[cartIndex].products;
+      const productIndex = products.findIndex(p => p.id === productId);
+      if (productIndex === -1) {
+        return null;
+      } else {
+        products[productIndex].stock = newStock;
+        await fs.writeFile(CARTS_FILE, JSON.stringify(carts, null, 2));
+        return carts[cartIndex];
+      }
+    }
+  }
 }

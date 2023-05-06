@@ -1,7 +1,8 @@
 import { Router } from "express";
 import multer from "multer";
+import config from "../config/config.js";
 import { getCarts, getCartById, addCart, updateCart, deleteCart, removeFromCart, replaceCartContent, updateCartProductStock } from "../Dao/DB/carts.service.js";
-
+import CartManager from "../Dao/FileSystem/carts.service.js";
 //Se define el router
 const router = Router();
 
@@ -9,12 +10,11 @@ const router = Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-
 //Carga y muestra cada carrito
 router.get('/get', async (req,res) => {
     console.log("Loading carts...");
-    
-    const carts = await getCarts();
+
+    let carts = config.useFS ? await CartManager.getAllCarts() : await getCarts();
     
     console.log(carts);
     res.send(carts);
@@ -22,9 +22,15 @@ router.get('/get', async (req,res) => {
 
 //Carga un carrito en especifico.
 router.get('/get/:cid', async (req, res) => {
-    let cid = req.params.cid;
+    //FS y Mongo tienen forma distintas de clasificar el carrito, así que 
+    let cartFound;
+    let cid =  req.params.cid;
 
-    let cartFound = await getCartById(cid);
+    if (!config.useFS){
+        cartFound = await getCartById(cid);
+    }else{
+        cartFound = await CartManager.getCartById(cid);
+    }
 
     //Esta condicional pregunta si se encontró el carrito en el array
     //Si se encontró, lo muestra.
@@ -36,13 +42,17 @@ router.get('/get/:cid', async (req, res) => {
 router.post('/post', upload.array(), async (req,res) => {
     let products = req.body; 
 
-    //Se define el carrito con un array con los productos que lleva
-    let cart = {
-        products: [...products]
-    };
+    try{
+        if (!config.useFS) {
+            let cart = {
+                products: [...products]
+            };
 
-    try {
-        const newCart = await addCart(cart);
+            const newCart = await addCart(cart);
+        }else{
+            const newCart = await CartManager.addCart({ products });
+        }
+
         console.log('Cart created:', newCart);
         res.send(newCart);
     } catch (error) {
@@ -56,7 +66,8 @@ router.post('/post/:cid/product/:pid', async (req,res) => {
     let cid = req.params.cid;
     let pid = req.params.pid;
 
-    const carts = await getCarts();    
+    const carts = config.useFS ? await CartManager.getAllCarts() : await getCarts();    
+    
 
     //Se verifica la existencia del producto en el carrito
     let cartFound = carts.find(cart => cart.id === cid);
@@ -78,7 +89,7 @@ router.post('/post/:cid/product/:pid', async (req,res) => {
           }
         
           // Actualizamos el carrito en la base de datos
-        await updateCart(cartFound.id, cartFound);
+        config.useFS ? CartManager.updateCart(cartFound.id, cartFound) : await updateCart(cartFound.id, cartFound);
     }else{
 
         //Como el carrito no exista, lo avisamos.
@@ -95,10 +106,20 @@ router.put('/put/:cid', async (req, res) => {
     let cid = req.params.cid;
     let products = req.body; 
 
-    await replaceCartContent(cid, products);
-
-    let updatedCart = await getCartById(cid);
-    res.send(updatedCart);
+    try {
+        let updatedCart;
+        if (config.useFS) {
+            await replaceCartContent(cid, products);
+            updatedCart = await getCartById(cid);
+        } else {
+            updatedCart = await CartManager.updateCart(cid, { products });
+        }
+    
+        res.send(updatedCart);
+      } catch (error) {
+        console.error('Error updating cart:', error);
+        res.status(500).send('Error updating cart');
+      }
 })
 
 //Se actualiza el stock de un producto del carrito con el que le ingresamos
@@ -107,10 +128,20 @@ router.put('/put/:cid/products/:pid', async (req, res) => {
     let pid = req.params.pid;
     let stock = req.body;  
 
-    await updateCartProductStock(cid, pid, stock);
+    try {
+        if (!config.useFS) {
+            await updateCartProductStock(cid, pid, stock);
+            let updatedCart = await getCartById(cid);
+        }else{
+            await CartManager.updateProductStock(cid, pid, stock);
+            let updatedCart = await CartManager.getCartById(cid);
+        }
 
-    let updatedCart = await getCartById(cid);
-    res.send(updatedCart);
+        res.send(updatedCart);
+    } catch (error) {
+        console.error(`Error updating product stock for cart ${cid} and product ${pid}:`, error);
+        res.status(500).send('Error updating product stock');
+    }
 })
 
 //Quitamos un producto del carrito (incluyendo su stock)
@@ -118,28 +149,50 @@ router.delete('/delete/:cid/products/:pid', async (req, res) => {
     let cid = req.params.cid;
     let pid = req.params.pid;
 
-    await removeFromCart(cid,pid);
-
-    let carts = await getCarts();
-    res.send(carts)
+    try {
+        if (!config.useFS) {
+            await removeFromCart(cid,pid);
+            let carts = await getCarts();
+        } else {
+            await CartManager.removeProduct(cid, pid);
+            let carts = await CartManager.getAllCarts();
+        }
+        
+        res.send(carts);
+    } catch (error) {
+        console.error(`Error removing product ${pid} from cart ${cid}:`, error);
+        res.status(500).send('Error removing product from cart');
+    }
 })
 
 //Quitamos el carrito, así de simple.
 router.delete('/delete/:cid', async (req, res) => {
     let cid = req.params.cid;
+    
+    try {
+        if (!config.useFS) {
+            await deleteCart(cid);
 
-    await deleteCart(cid);
-
-    let carts = await getCarts();
-    res.send(carts)
+            let carts = await getCarts();
+        } else {
+            await CartManager.deleteCart(cid);
+            let carts = await CartManager.getAllCarts();
+        }
+            
+        res.send(carts);
+    } catch (error) {
+        console.error(`Error deleting cart ${cid}:`, error);
+        res.status(500).send('Error deleting cart');
+    }
 })
 
 //
 //Acá se usan las variaciones filesystem de las funciones anteriores
 //
 
-//Se define el array de carritos (Comienza vacío en este caso)
+//Se define el array de carritos para los comandos FS viejos
 let fsCarts = [];
+
 
 //Carga y muestra cada carrito
 router.get('/fs/get', (req,res) => {
