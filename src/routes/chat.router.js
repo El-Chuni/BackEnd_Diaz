@@ -3,7 +3,7 @@ import { getMessages } from '../Dao/DB/messages.service.js';
 
 const router = express.Router();
 
-router.get("/", passport.authenticate('onlyAdmin', { failureRedirect: '/adminview' }), async (req, res)=>{
+router.get("/", passport.authenticate('onlyUser', { failureRedirect: '/adminview' }), async (req, res)=>{
     const messages = await getMessages();
     const adminView = false;
     res.render("chat", { messages, adminView });

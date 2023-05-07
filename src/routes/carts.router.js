@@ -3,6 +3,9 @@ import multer from "multer";
 import config from "../config/config.js";
 import { getCarts, getCartById, addCart, updateCart, deleteCart, removeFromCart, replaceCartContent, updateCartProductStock } from "../Dao/DB/carts.service.js";
 import CartManager from "../Dao/FileSystem/carts.service.js";
+import { getProductById, updateProduct } from "../Dao/DB/products.service.js";
+import ProductManager from "../Dao/FileSystem/products.service.js";
+import { addTicket } from "../Dao/DB/tickets.service.js";
 //Se define el router
 const router = Router();
 
@@ -34,7 +37,7 @@ router.get('/get/:cid', async (req, res) => {
     if (!config.useFS){
         cartFound = await getCartById(cid);
     }else{
-        cartFound = await CartManager.getCartById(cid);
+        cartFound = CartManager.getCartById(cid);
     }
 
     //Esta condicional pregunta si se encontró el carrito en el array
@@ -190,6 +193,64 @@ router.delete('/delete/:cid', passport.authenticate('onlyUser', { failureRedirec
         res.status(500).send('Error deleting cart');
     }
 })
+
+//Se termina la compra y se envía el ticket.
+router.post('/:cid/purchase', async (req, res) => {
+    let cid = req.params.cid;
+    let totalAmount = 0;
+    let buyingProducts = [];
+
+    if (!config.useFS){
+        const cart = await getCartById(cid);
+        for (const item of cart.products) {
+            const product = await getProductById(item.product);
+            if (product.stock < item.quantity) {
+                console.log(`There isn't enough stock of ${product.title} to buy`)
+            }else{
+                let newStock = product.stock - item.quantity;
+                await updateProduct(item.product, { stock: newStock });
+                totalAmount += (item.quantity * product.price);
+                buyingProducts.push({
+                    product: item.product,
+                    quantity: item.quantity
+                });
+                await removeFromCart(cid, item.product);
+            }
+        }
+    }else{
+        const cart = CartManager.getCartById(cid);
+        for (const item of cart.products) {
+            const product = ProductManager.getProductById(item.product);
+            if (product.stock < item.quantity) {
+                console.log(`There isn't enough stock of ${product.title} to buy`)
+            }else{
+                let newStock = product.stock - item.quantity;
+                ProductManager.updateProduct(item.product, { stock: newStock });
+                totalAmount += (item.quantity * product.price);
+                buyingProducts.push({
+                    product: item.product,
+                    quantity: item.quantity
+                });
+                ProductManager.removeFromCart(cid, item.product);
+            }
+        }
+    }
+
+    const ticketBody = {
+        products: buyingProducts,
+        amount: totalAmount,
+        purchaser: req.session.email,
+    };
+
+    await addTicket(ticketBody);
+    
+    if (!config.useFS){
+        let updatedCart = await getCartById(cid);
+        res.send(updateCart);
+    }else{
+        res.send(CartManager.getCartById(cid));
+    }
+});
 
 //
 //Acá se usan las variaciones filesystem de las funciones anteriores
