@@ -6,6 +6,7 @@ import CartManager from "../Dao/FileSystem/carts.service.js";
 import { getProductById, updateProduct } from "../Dao/DB/products.service.js";
 import ProductManager from "../Dao/FileSystem/products.service.js";
 import { addTicket } from "../Dao/DB/tickets.service.js";
+import { sendTicketByEmail } from "../controllers/email.controller.js";
 //Se define el router
 const router = Router();
 
@@ -236,13 +237,13 @@ router.post('/:cid/purchase', async (req, res) => {
         }
     }
 
-    const ticketBody = {
+    const ticket = await addTicket({
         products: buyingProducts,
         amount: totalAmount,
         purchaser: req.session.email,
-    };
-
-    await addTicket(ticketBody);
+    });
+    await sendTicketByEmail(ticket._id, req.session.email);
+      
     
     if (!config.useFS){
         let updatedCart = await getCartById(cid);

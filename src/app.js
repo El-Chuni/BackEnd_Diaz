@@ -17,6 +17,7 @@ import MongoStore from 'connect-mongo';
 import passport from 'passport';
 import config from './config/config.js';
 import initializePassport from './config/passport.config.js';
+import cors from 'cors';
 
 
 //Se hace lo necesario para activar el server
@@ -40,9 +41,10 @@ app.set('view engine','handlebars');
 let productManager = new ProductManager();
 
 //Estos app.use nos permitirán usar routers y varias funciones sin problemas
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-app.use(express.static(__dirname+'/public'))
+app.use(express.json());
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(__dirname+'/public'));
 
 app.use(session({
   store:MongoStore.create({
