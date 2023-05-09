@@ -37,6 +37,7 @@ export const getACartById = async (req, res) => {
 //Añade un carrito al array.
 export const addACart = async (req,res) => {
     let products = req.body; 
+    let newCart;
 
     try{
         if (!config.useFS) {
@@ -44,9 +45,9 @@ export const addACart = async (req,res) => {
                 products: [...products]
             };
 
-            const newCart = await addCart(cart);
+            newCart = await addCart(cart);
         }else{
-            const newCart = await CartManager.addCart({ products });
+            newCart = await CartManager.addCart({ products });
         }
 
         console.log('Cart created:', newCart);
@@ -101,9 +102,10 @@ export const updateProductInCart = async (req,res) => {
 export const cleanCart = async (req, res) => {
     let cid = req.params.cid;
     let products = req.body; 
+    let updatedCart;
 
     try {
-        let updatedCart;
+        
         if (config.useFS) {
             await replaceCartContent(cid, products);
             updatedCart = await getCartById(cid);
@@ -123,14 +125,15 @@ export const updateCartProductQuantity = async (req, res) => {
     let cid = req.params.cid;
     let pid = req.params.pid;
     let stock = req.body;  
+    let updatedCart;
 
     try {
         if (!config.useFS) {
             await updateCartProductStock(cid, pid, stock);
-            let updatedCart = await getCartById(cid);
+            updatedCart = await getCartById(cid);
         }else{
             await CartManager.updateProductStock(cid, pid, stock);
-            let updatedCart = await CartManager.getCartById(cid);
+            updatedCart = await CartManager.getCartById(cid);
         }
 
         res.send(updatedCart);
@@ -144,14 +147,16 @@ export const updateCartProductQuantity = async (req, res) => {
 export const removeProductFromCart = async (req, res) => {
     let cid = req.params.cid;
     let pid = req.params.pid;
+    let carts;
 
     try {
+        
         if (!config.useFS) {
             await removeFromCart(cid,pid);
-            let carts = await getCarts();
+            carts = await getCarts();
         } else {
             await CartManager.removeProduct(cid, pid);
-            let carts = await CartManager.getAllCarts();
+            carts = await CartManager.getAllCarts();
         }
         
         res.send(carts);
@@ -164,15 +169,16 @@ export const removeProductFromCart = async (req, res) => {
 //Quitamos el carrito, así de simple.
 export const eliminateCart = async (req, res) => {
     let cid = req.params.cid;
-    
+    let carts;
+
     try {
         if (!config.useFS) {
             await deleteCart(cid);
 
-            let carts = await getCarts();
+            carts = await getCarts();
         } else {
             await CartManager.deleteCart(cid);
-            let carts = await CartManager.getAllCarts();
+            carts = await CartManager.getAllCarts();
         }
             
         res.send(carts);
@@ -233,7 +239,7 @@ export const purchaseCartContent = async (req, res) => {
       
     
     if (!config.useFS){
-        let updatedCart = await getCartById(cid);
+        let updateCart = await getCartById(cid);
         res.send(updateCart);
     }else{
         res.send(CartManager.getCartById(cid));
