@@ -6,10 +6,6 @@ import { addAProduct, deleteAProduct, getAProductById, getProductsByParameters, 
 //Se define el router
 const router = Router();
 
-//Se define el manager de productos (En ingles esta vez debido
-//a las condiciones de la última entrega)
-const productManager = new ProductManager();
-
 //Aplicamos el multer para que luego se puedan subir arrays en /post y /put
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
