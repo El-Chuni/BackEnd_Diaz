@@ -1,12 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
-import config from "../config/config.js";
-import { getCarts, getCartById, addCart, updateCart, deleteCart, removeFromCart, replaceCartContent, updateCartProductStock } from "../Dao/DB/carts.service.js";
-import CartManager from "../Dao/FileSystem/carts.service.js";
-import { getProductById, updateProduct } from "../Dao/DB/products.service.js";
-import ProductManager from "../Dao/FileSystem/products.service.js";
-import { addTicket } from "../Dao/DB/tickets.service.js";
-import { sendTicketByEmail } from "../controllers/email.controller.js";
+import { addACart, cleanCart, eliminateCart, getACartById, getAllCarts, purchaseCartContent, removeProductFromCart, updateCartProductQuantity, updateProductInCart } from "../controllers/carts.controller.js";
+
 //Se define el router
 const router = Router();
 
@@ -20,238 +15,31 @@ router.get('/forbidden', async (req,res) => {
 })
 
 //Carga y muestra cada carrito
-router.get('/get', async (req,res) => {
-    console.log("Loading carts...");
-
-    let carts = config.useFS ? await CartManager.getAllCarts() : await getCarts();
-    
-    console.log(carts);
-    res.send(carts);
-})
+router.get('/get', getAllCarts)
 
 //Carga un carrito en especifico.
-router.get('/get/:cid', async (req, res) => {
-    //FS y Mongo tienen forma distintas de clasificar el carrito, así que 
-    let cartFound;
-    let cid =  req.params.cid;
-
-    if (!config.useFS){
-        cartFound = await getCartById(cid);
-    }else{
-        cartFound = CartManager.getCartById(cid);
-    }
-
-    //Esta condicional pregunta si se encontró el carrito en el array
-    //Si se encontró, lo muestra.
-    //Caso contrario, manda error 404 (No encontrado) http.cat/404
-    cartFound ? res.send(cartFound) : res.status(404).send({status: "Error", message: "The cart doesn't exist, use the normal GET to check the inventory."});
-})
+router.get('/get/:cid', getACartById)
 
 //Añade un carrito al array.
-router.post('/post', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), upload.array(), async (req,res) => {
-    let products = req.body; 
-
-    try{
-        if (!config.useFS) {
-            let cart = {
-                products: [...products]
-            };
-
-            const newCart = await addCart(cart);
-        }else{
-            const newCart = await CartManager.addCart({ products });
-        }
-
-        console.log('Cart created:', newCart);
-        res.send(newCart);
-    } catch (error) {
-        console.error('Error creating cart:', error);
-        res.status(500).send('Error creating cart');
-    }
-})
+router.post('/post', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), upload.array(), addACart)
 
 //Se añade un producto especifico a un carrito especifico.
-router.post('/post/:cid/product/:pid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), async (req,res) => {
-    let cid = req.params.cid;
-    let pid = req.params.pid;
-
-    const carts = config.useFS ? await CartManager.getAllCarts() : await getCarts();    
-    
-
-    //Se verifica la existencia del producto en el carrito
-    let cartFound = carts.find(cart => cart.id === cid);
-
-    if (cartFound){
-        //Ahora hacemos lo mismo buscando si existe en producto en el carrito
-        let productFound = cartFound.products.find(product => product.id === pid);
-
-        if (!productFound) {
-            // Si no existe, lo añadimos
-            let product = {
-              id: pid,
-              stock: 1,
-            };
-            cartFound.products.push(product);
-          } else {
-            // Si existe, le sumamos uno a su stock
-            productFound.stock++;
-          }
-        
-          // Actualizamos el carrito en la base de datos
-        config.useFS ? CartManager.updateCart(cartFound.id, cartFound) : await updateCart(cartFound.id, cartFound);
-    }else{
-
-        //Como el carrito no exista, lo avisamos.
-        res.status(404).send({status: "Error", message: "The cart doesn't exist, use GET to check the inventory."});
-    
-    }
-
-    console.log(cartFound);
-    res.send(cartFound);
-})
+router.post('/post/:cid/product/:pid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), updateProductInCart)
 
 //Limpiamos el carrito y ponemos otros productos en su lugar
-router.put('/put/:cid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), async (req, res) => {
-    let cid = req.params.cid;
-    let products = req.body; 
-
-    try {
-        let updatedCart;
-        if (config.useFS) {
-            await replaceCartContent(cid, products);
-            updatedCart = await getCartById(cid);
-        } else {
-            updatedCart = await CartManager.updateCart(cid, { products });
-        }
-    
-        res.send(updatedCart);
-      } catch (error) {
-        console.error('Error updating cart:', error);
-        res.status(500).send('Error updating cart');
-      }
-})
+router.put('/put/:cid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), cleanCart)
 
 //Se actualiza el stock de un producto del carrito con el que le ingresamos
-router.put('/put/:cid/products/:pid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), async (req, res) => {
-    let cid = req.params.cid;
-    let pid = req.params.pid;
-    let stock = req.body;  
-
-    try {
-        if (!config.useFS) {
-            await updateCartProductStock(cid, pid, stock);
-            let updatedCart = await getCartById(cid);
-        }else{
-            await CartManager.updateProductStock(cid, pid, stock);
-            let updatedCart = await CartManager.getCartById(cid);
-        }
-
-        res.send(updatedCart);
-    } catch (error) {
-        console.error(`Error updating product stock for cart ${cid} and product ${pid}:`, error);
-        res.status(500).send('Error updating product stock');
-    }
-})
+router.put('/put/:cid/products/:pid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), updateCartProductQuantity)
 
 //Quitamos un producto del carrito (incluyendo su stock)
-router.delete('/delete/:cid/products/:pid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), async (req, res) => {
-    let cid = req.params.cid;
-    let pid = req.params.pid;
-
-    try {
-        if (!config.useFS) {
-            await removeFromCart(cid,pid);
-            let carts = await getCarts();
-        } else {
-            await CartManager.removeProduct(cid, pid);
-            let carts = await CartManager.getAllCarts();
-        }
-        
-        res.send(carts);
-    } catch (error) {
-        console.error(`Error removing product ${pid} from cart ${cid}:`, error);
-        res.status(500).send('Error removing product from cart');
-    }
-})
+router.delete('/delete/:cid/products/:pid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), removeProductFromCart)
 
 //Quitamos el carrito, así de simple.
-router.delete('/delete/:cid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), async (req, res) => {
-    let cid = req.params.cid;
-    
-    try {
-        if (!config.useFS) {
-            await deleteCart(cid);
-
-            let carts = await getCarts();
-        } else {
-            await CartManager.deleteCart(cid);
-            let carts = await CartManager.getAllCarts();
-        }
-            
-        res.send(carts);
-    } catch (error) {
-        console.error(`Error deleting cart ${cid}:`, error);
-        res.status(500).send('Error deleting cart');
-    }
-})
+router.delete('/delete/:cid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), eliminateCart)
 
 //Se termina la compra y se envía el ticket.
-router.post('/:cid/purchase', async (req, res) => {
-    let cid = req.params.cid;
-    let totalAmount = 0;
-    let buyingProducts = [];
-
-    if (!config.useFS){
-        const cart = await getCartById(cid);
-        for (const item of cart.products) {
-            const product = await getProductById(item.product);
-            if (product.stock < item.quantity) {
-                console.log(`There isn't enough stock of ${product.title} to buy`)
-            }else{
-                let newStock = product.stock - item.quantity;
-                await updateProduct(item.product, { stock: newStock });
-                totalAmount += (item.quantity * product.price);
-                buyingProducts.push({
-                    product: item.product,
-                    quantity: item.quantity
-                });
-                await removeFromCart(cid, item.product);
-            }
-        }
-    }else{
-        const cart = CartManager.getCartById(cid);
-        for (const item of cart.products) {
-            const product = ProductManager.getProductById(item.product);
-            if (product.stock < item.quantity) {
-                console.log(`There isn't enough stock of ${product.title} to buy`)
-            }else{
-                let newStock = product.stock - item.quantity;
-                ProductManager.updateProduct(item.product, { stock: newStock });
-                totalAmount += (item.quantity * product.price);
-                buyingProducts.push({
-                    product: item.product,
-                    quantity: item.quantity
-                });
-                ProductManager.removeFromCart(cid, item.product);
-            }
-        }
-    }
-
-    const ticket = await addTicket({
-        products: buyingProducts,
-        amount: totalAmount,
-        purchaser: req.session.email,
-    });
-    await sendTicketByEmail(ticket._id, req.session.email);
-      
-    
-    if (!config.useFS){
-        let updatedCart = await getCartById(cid);
-        res.send(updateCart);
-    }else{
-        res.send(CartManager.getCartById(cid));
-    }
-});
+router.post('/:cid/purchase', purchaseCartContent);
 
 //
 //Acá se usan las variaciones filesystem de las funciones anteriores
