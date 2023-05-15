@@ -2,6 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import passport from "passport";
 import { addAProduct, deleteAProduct, getAProductById, getProductsByParameters, getProductsList, updateAProduct } from "../controllers/products.controller.js";
+import { generateMockProducts } from "../controllers/mocker.controller.js";
 
 //Se define el router
 const router = Router();
@@ -23,6 +24,9 @@ router.get('/forbidden', async (req,res) => {
 
 //Carga y muestra un producto en particular
 router.get('/get/:pid', getAProductById)
+
+//Hace un mock de products en mongo y cargo el resultado.
+router.get('/mockingproducts', generateMockProducts)
 
 //Añade un producto al array
 router.post('/post', passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), upload.array(), addAProduct);

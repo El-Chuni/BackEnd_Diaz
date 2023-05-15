@@ -2,20 +2,32 @@ import Product from "./models/products.js"
 import fs from 'fs';
 
 export default class ProductManager {
-    constructor(){
-        this.filePath = '.../ProductList.txt';
-        fs.readFile(this.filePath, 'utf-8', (error, result) => {
-            if (error){
-                this.products = [];
-                fs.writeFile(this.filePath, JSON.stringify(this.products), (err) => {
-                  if (err) throw err;
-                  console.log('The file has been saved!');
-                });
+    constructor() {
+        this.filePath = './ProductList.txt';
+        
+        if (fs.existsSync(this.filePath)) {
+          // El archivo existe, se lee su contenido
+          fs.readFile(this.filePath, 'utf-8', (error, result) => {
+            if (error) {
+              console.error('Error reading file:', error);
+              this.products = [];
             } else {
-                this.products = JSON.parse(result);
+              this.products = JSON.parse(result);
             }
-        })
-    }
+          });
+        } else {
+          // El archivo no existe, se crea y se inicializa con una lista vacía
+          this.products = [];
+          fs.writeFile(this.filePath, JSON.stringify(this.products), (err) => {
+            if (err) {
+              console.error('Error creating file:', err);
+            } else {
+              console.log('The file has been created and saved!');
+            }
+          });
+        }
+      }
+      
 
     addProduct(newProduct) {
         const { title, description, price, thumbnail, code, stock, category } = newProduct;

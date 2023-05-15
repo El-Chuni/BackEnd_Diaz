@@ -30,6 +30,8 @@ const getProductsByParams = async (limit, page, query, sort) => {
 
 const addProduct = async (body) => productModel.create(body);
 
+const addManyProducts = async (body) => productModel.insertMany(body);
+
 const updateProduct = async (pid, update) => productModel.findOneAndUpdate({id: pid}, update);
 
 const deleteProduct = async (pid) => {
@@ -41,4 +43,4 @@ const deleteProduct = async (pid) => {
   }
 }
   
-export { getProducts, getProductById, getProductsByParams, addProduct, updateProduct, deleteProduct }
+export { getProducts, getProductById, getProductsByParams, addProduct, addManyProducts,  updateProduct, deleteProduct }
