@@ -5,6 +5,7 @@ import { getProductById, updateProduct } from "../Dao/DB/products.service.js";
 import ProductManager from "../Dao/FileSystem/products.service.js";
 import { addTicket } from "../Dao/DB/tickets.service.js";
 import { sendTicketByEmail } from "./email.controller.js";
+import customError from "./error.controller.js";
 
 //Carga y muestra cada carrito
 export const getAllCarts = async (req,res) => {
@@ -31,7 +32,9 @@ export const getACartById = async (req, res) => {
     //Esta condicional pregunta si se encontró el carrito en el array
     //Si se encontró, lo muestra.
     //Caso contrario, manda error 404 (No encontrado) http.cat/404
-    cartFound ? res.send(cartFound) : res.status(404).send({status: "Error", message: "The cart doesn't exist, use the normal GET to check the inventory."});
+    
+    cartFound ? res.send(cartFound) : customError(404, "The cart doesn't exist, use the normal GET to check the inventory.");
+    //cartFound ? res.send(cartFound) : res.status(404).send({status: "Error", message: "The cart doesn't exist, use the normal GET to check the inventory."});
 }
 
 //Añade un carrito al array.
@@ -53,8 +56,9 @@ export const addACart = async (req,res) => {
         console.log('Cart created:', newCart);
         res.send(newCart);
     } catch (error) {
-        console.error('Error creating cart:', error);
-        res.status(500).send('Error creating cart');
+        customError(500, 'Error creating cart');
+        //console.error('Error creating cart:', error);
+        //res.status(500).send('Error creating cart');
     }
 }
 
@@ -90,7 +94,8 @@ export const updateProductInCart = async (req,res) => {
     }else{
 
         //Como el carrito no exista, lo avisamos.
-        res.status(404).send({status: "Error", message: "The cart doesn't exist, use GET to check the inventory."});
+        customError(404, "The cart doesn't exist, use GET to check the inventory.")
+        //res.status(404).send({status: "Error", message: "The cart doesn't exist, use GET to check the inventory."});
     
     }
 
@@ -115,8 +120,9 @@ export const cleanCart = async (req, res) => {
     
         res.send(updatedCart);
       } catch (error) {
-        console.error('Error updating cart:', error);
-        res.status(500).send('Error updating cart');
+        customError(500, 'Error updating cart');
+        //console.error('Error updating cart:', error);
+        //res.status(500).send('Error updating cart');
       }
 }
 
@@ -138,8 +144,9 @@ export const updateCartProductQuantity = async (req, res) => {
 
         res.send(updatedCart);
     } catch (error) {
-        console.error(`Error updating product stock for cart ${cid} and product ${pid}:`, error);
-        res.status(500).send('Error updating product stock');
+        customError(500, `Error updating product stock for cart ${cid} and product ${pid}.`);
+        //console.error(`Error updating product stock for cart ${cid} and product ${pid}:`, error);
+        //res.status(500).send('Error updating product stock');
     }
 }
 
@@ -161,8 +168,9 @@ export const removeProductFromCart = async (req, res) => {
         
         res.send(carts);
     } catch (error) {
-        console.error(`Error removing product ${pid} from cart ${cid}:`, error);
-        res.status(500).send('Error removing product from cart');
+        customError(500, `Error removing product ${pid} from cart ${cid}.`);
+        //console.error(`Error removing product ${pid} from cart ${cid}:`, error);
+        //res.status(500).send('Error removing product from cart');
     }
 }
 
@@ -183,8 +191,9 @@ export const eliminateCart = async (req, res) => {
             
         res.send(carts);
     } catch (error) {
-        console.error(`Error deleting cart ${cid}:`, error);
-        res.status(500).send('Error deleting cart');
+        customError(500, `Error deleting cart ${cid}.`);
+        //console.error(`Error deleting cart ${cid}:`, error);
+        //res.status(500).send('Error deleting cart');
     }
 }
 

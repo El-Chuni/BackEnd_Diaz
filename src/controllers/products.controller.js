@@ -1,6 +1,7 @@
 import config from "../config/config.js";
 import ProductManager from "../Dao/FileSystem/products.service.js";
 import { addProduct, deleteProduct, getProductById, getProducts, getProductsByParams, updateProduct } from "../Dao/DB/products.service.js";
+import customError from "./error.controller.js";
 
 //Se define el manager de productos 
 const productManager = new ProductManager();
@@ -15,7 +16,8 @@ export const getProductsByParameters = async (req, res) => {
     console.log("Loading products...");
     let products = await getProductsByParams(limit, page, query, sort);
     console.log(products);
-    products ? res.send(products) : res.status(404).send({status: "Error", message: "No se encontraron productos"});
+    products ? res.send(products) : customError(404,"No se encontraron productos");
+    //products ? res.send(products) : res.status(404).send({status: "Error", message: "No se encontraron productos"});
   } else {
     res.send("Opción no disponible en FS.")
   }
@@ -40,7 +42,10 @@ export const getAProductById = async (req, res) => {
     //Esta condicional pregunta si se encontró el producto en el array
     //Si se encontró, lo muestra.
     //Caso contrario, manda error 404 (No encontrado) http.cat/404
-    productFound ? res.send(productFound) : res.status(404).send({status: "Error", message: "The product doesn't exist, use GET to check the inventory."});
+    
+    
+    productFound ? res.send(productFound) : customError(404, "The product doesn't exist, use GET to check the inventory.");
+    //productFound ? res.send(productFound) : res.status(404).send({status: "Error", message: "The product doesn't exist, use GET to check the inventory."});
 }
 
 //Añade un producto al array
@@ -57,7 +62,8 @@ export const addAProduct = async (req, res) => {
       res.send(productManager.getProducts());
     }
   } catch (error) {
-    res.status(400).send({status: "Error", message: error.message});
+    customError(400, error.message);
+    //res.status(400).send({status: "Error", message: error.message});
   };
 }
  
@@ -67,11 +73,12 @@ export const deleteAProduct = async (req, res) => {
 
     //Se verifica si existe y lo borra, sino manda error.
     try {
-        config.useFS ? productManager.deleteProduct(pid) : await deleteProduct(pid);
+      config.useFS ? productManager.deleteProduct(pid) : await deleteProduct(pid);
  
-        res.send("Product deleted.");
+      res.send("Product deleted.");
     } catch (error) {
-        res.status(404).send({status: "Error", message: error.message});
+      customError(404, error.message);
+      //res.status(404).send({status: "Error", message: error.message});
     }
 }
 
@@ -82,18 +89,19 @@ export const updateAProduct = async (req,res) =>{
 
     //Se verifica su existencia y lo actualiza, sino avisa del error.
     try {
-        if (!config.useFS){
-            await updateProduct(pid, productUpdate)
+      if (!config.useFS){
+          await updateProduct(pid, productUpdate)
 
-            let products = await getProducts();
+          let products = await getProducts();
 
-            res.send(products)
-        }else{
-            productManager.updateProduct(pid, productUpdate);
+          res.send(products)
+      }else{
+          productManager.updateProduct(pid, productUpdate);
 
-            res.send(productManager.getProducts());
-        }
+          res.send(productManager.getProducts());
+      }
     } catch (error) {
-        res.status(404).send({status: "Error", message: error.message});
+      customError(404, error.message)
+      //res.status(404).send({status: "Error", message: error.message});
     }
 }

@@ -36,7 +36,8 @@ const generateMockProducts = async () => {
       await addManyProducts(mockProducts);
       console.log('Mock products created successfully.');
     } catch (error) {
-      console.error('Error creating mock products:', error);
+        customError(500, 'Error creating mock products.');
+        //console.error('Error creating mock products:', error);
     }
 
     await getProducts();
