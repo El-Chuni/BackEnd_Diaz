@@ -18,6 +18,7 @@ import passport from 'passport';
 import config from './config/config.js';
 import initializePassport from './config/passport.config.js';
 import cors from 'cors';
+import { addLogger } from './config/logger.js';
 
 
 //Se hace lo necesario para activar el server
@@ -45,6 +46,7 @@ app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname+'/public'));
+app.use(addLogger);
 
 app.use(session({
   store:MongoStore.create({
@@ -110,7 +112,8 @@ const connectMongoDB = async ()=>{
       await mongoose.connect(config.mongoUrl);
       console.log("Conectado con exito a MongoDB usando Moongose.");
   } catch (error) {
-      console.error("No se pudo conectar a la BD usando Moongose: " + error);
+      req.logger.error("No se pudo conectar a la BD usando Moongose: " + error)
+      //console.error("No se pudo conectar a la BD usando Moongose: " + error);
       process.exit();
   }
 };
@@ -130,7 +133,7 @@ app.get('/saludo', (req, res) => {
 });
 
 
-app.get('/products', (req, res) => {
+/*app.get('/products', (req, res) => {
   let limit = parseInt(req.query.limit);
   let products = productManager.products;
 
@@ -147,7 +150,7 @@ app.get('/products/:pid', (req, res) => {
   let productFound = products.find(product => product.id === pid);
 
   res.send(productFound || {});
-});
+});*/
 
 app.get('/session', (req, res) => {
   if(req.session.counter){
@@ -157,4 +160,14 @@ app.get('/session', (req, res) => {
     req.session.counter = 1;
     res.send('¡Bienvenido a tu primer visita!')
   }
+})
+
+app.get('/loggerTest', (req, res) => {
+  console.log("DEPLOYING ALL THE LOGGERS.");
+
+  req.logger.debug("Guldo!");  
+  req.logger.info("Jeice!");
+  req.logger.warning("Burter!");
+  req.logger.error("Recoome!");
+  req.logger.fatal("Ginyu!");  
 })

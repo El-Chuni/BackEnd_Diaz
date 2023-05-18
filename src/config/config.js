@@ -21,6 +21,7 @@ dotenv.config({
 //useFS define cual sistema de almacenamiento de datos uso
 export default {
     port: process.env.PORT,
+    consoleLogger: process.env.CONSOLE_LOGGER,
     mongoUrl: process.env.MONGO_URL,
     adminName: process.env.ADMIN_NAME,
     adminPassword: process.env.ADMIN_PASSWORD,

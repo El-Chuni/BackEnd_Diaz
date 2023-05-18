@@ -16,6 +16,8 @@ const generateRandomCode = () => {
 const generateMockProducts = async () => {
     const mockProducts = [];
     
+    //Sí, podría haber usado Faker, pero quería hacerlo
+    //lo más generico posible.
     for (let i = 1; i <= 100; i++) {
         const mockProduct = {
             title: `Product ${i}`,
