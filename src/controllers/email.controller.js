@@ -28,8 +28,8 @@ const mailOptions = {
     attachments: []
 }
 
-/*
-const mailOptionsWithAttachments = {
+
+/*const mailOptionsWithAttachments = {
     from: "Coder Test " + config.gmailAccount,
     to: config.gmailAccount,
     subject: "Correo de prueba Coderhouse Programacion Backend clase 30.",
@@ -45,8 +45,9 @@ const mailOptionsWithAttachments = {
             cid: 'meme'
         }
     ]
-}
-*/
+}*/
+
+
 
 
 //Acá es donde se prepara y envía el mail con el ticket.
@@ -118,3 +119,33 @@ export const sendEmailWithAttachments = (req, res) => {
     }
     
 }
+
+export const sendEmailAccountRecovery = (req, res) => {
+    const {email, link} = req.body;
+    const mailAccountRecovery = {
+        from: "Coder Test " + config.gmailAccount,
+        to: email,
+        subject: "Correo de prueba Coderhouse Programacion Backend clase 30.",
+        html: `<div>
+                    <h1>Aquí tiene el link para cambiar su contraseña</h1>
+                    <p>no la va a recuperar (pues debería seguir funcionando) pero podrá cambiarla por una que pueda recordar mejor.</p>
+                    
+                    <a>${link}</a>
+                </div>`,
+        attachments: []
+    }
+
+    try {
+        let result = transporter.sendMail(mailAccountRecovery, (error, info) => {
+            if (error) {
+                console.log(error);
+                res.status(400).send({message: "Error", payload: error});
+            }
+            console.log('Message sent: %s', info.messageId);
+            res.send({message: "Success!", payload: info});
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({error:  error, message: "No se pudo enviar el email desde:" + config.gmailAccount});
+    }
+};

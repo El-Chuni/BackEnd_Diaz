@@ -19,6 +19,7 @@ import config from './config/config.js';
 import initializePassport from './config/passport.config.js';
 import cors from 'cors';
 import { addLogger } from './config/logger.js';
+import cookieParser from 'cookie-parser';
 
 
 //Se hace lo necesario para activar el server
@@ -47,6 +48,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname+'/public'));
 app.use(addLogger);
+app.use(cookieParser);
 
 app.use(session({
   store:MongoStore.create({
@@ -132,25 +134,6 @@ app.get('/saludo', (req, res) => {
   res.send("https://www.youtube.com/watch?v=3V93ZyaiDPA");
 });
 
-
-/*app.get('/products', (req, res) => {
-  let limit = parseInt(req.query.limit);
-  let products = productManager.products;
-
-  if (limit > 0) {
-    products = products.filter(product => product.id < limit);
-  }
-
-  res.send(products);
-});
-
-app.get('/products/:pid', (req, res) => {
-  let pid = parseInt(req.params.pid);
-  const products = productManager.products;
-  let productFound = products.find(product => product.id === pid);
-
-  res.send(productFound || {});
-});*/
 
 app.get('/session', (req, res) => {
   if(req.session.counter){

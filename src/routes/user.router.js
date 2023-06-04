@@ -54,6 +54,23 @@ router.get("/", (req, res) =>{
     });
 });
 
+router.get("/recoveraccount", async (req, res) => {
+    res.render("recover");
+});
+
+router.get("/changePassword", async (req, res) => {
+    let id = req.params.id;
+    const user = await userModel.findOne({_id: id});
+
+
+    let first_name = user.first_name;
+    res.render("change", {
+        first_name,
+        currentPasswordHash: user.password,
+        id: id
+    });
+});
+
 //Se acaba la sessión
 router.get("/logout", (req, res) => {
     req.session.destroy(error => {
