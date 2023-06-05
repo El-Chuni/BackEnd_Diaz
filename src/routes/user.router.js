@@ -55,16 +55,17 @@ router.get("/", (req, res) =>{
     });
 });
 
-router.get("/", passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), async (req, res) =>{
-    const user = req.session.user;
+router.get("/premium/:uid", passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), async (req, res) =>{
+    let uid = req.params.uid;
+    const user = await userModel.findById(uid);
+    let changeRoleTo = 'user';
+
     if (user.role == 'user'){
-        let changeRoleTo = 'premium'
-    } else {
-        let changeRoleTo = 'premium'
-    }
+        changeRoleTo = 'premium';
+    } 
 
     await userModel.findOneAndUpdate({_id: user._id}, {role: changeRoleTo});
-    res.send(`Ahora sos un ${changeRoleTo}.`);
+    res.send(`El usuario con ID ${uid} ahora es un ${changeRoleTo}.`);
 });
 
 //Un aviso si la autentificación falla en ciertas funciones
