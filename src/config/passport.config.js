@@ -35,7 +35,7 @@ const initializePassport = () => {
                         email: profile._json.email,
                         password: '',
                         loggedBy: "GitHub",
-                        role: 'user'
+                        role: 'usuario'
                     };
                     const result = await userModel.create(newUser);
                     return done(null, result);
@@ -127,6 +127,60 @@ const initializePassport = () => {
         }
       }
     ));
+
+    passport.use('forbiddenForCommonUser', new localStrategy({ usernameField: 'username' },
+        async (username, done) => {
+            try {
+                const user = await userModel.findOne({ username: username });
+                if (!user) {
+                  return done(null, false);
+                }
+
+                if (user.role !== 'usuario') {
+                    return done(null, user);
+                } else {
+                    console.warn("Access denied, only premium or admin users are allowed.");
+                    return done(null, false);
+                }
+            } catch (error) {
+                return done(error);
+            }
+        }  
+    ));
+    
+    /*passport.use('onlyProductOwner', new localStrategy({ usernameField: 'username' },
+        async (username, done) => {
+            try {
+                const user = await userModel.findOne({ username: username });
+                if (!user) {
+                  return done(null, false);
+                }
+
+                switch (user.role) {
+                    case 'usuario':
+                        console.warn("Access denied, only owner or admin users are allowed.");
+                        return done(null, false);
+                        break;
+                    
+                    case 'premium':
+                        if ()
+                        break;
+                    
+                    default:
+                        return done(null, user);
+                        break;
+                }
+
+                if (user.role !== 'usuario') {
+
+                    
+                } else {
+                    
+                }
+            } catch (error) {
+                return done(error);
+            }
+        }))*/
 
     //Funciones de Serializacion y Desserializacion
     passport.serializeUser((user, done) => {

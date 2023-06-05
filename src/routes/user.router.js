@@ -1,5 +1,6 @@
 import { Router } from "express";
 import passport from "passport";
+import userModel from "../Dao/DB/models/user";
 
 const router = Router();
 
@@ -53,6 +54,23 @@ router.get("/", (req, res) =>{
         user: req.session.user
     });
 });
+
+router.get("/", passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), async (req, res) =>{
+    const user = req.session.user;
+    if (user.role == 'user'){
+        let changeRoleTo = 'premium'
+    } else {
+        let changeRoleTo = 'premium'
+    }
+
+    await userModel.findOneAndUpdate({_id: user._id}, {role: changeRoleTo});
+    res.send(`Ahora sos un ${changeRoleTo}.`);
+});
+
+//Un aviso si la autentificación falla en ciertas funciones
+router.get('/forbidden', async (req,res) => {
+    res.send("No estás autorizado para ejecutar cambios acá.")
+})
 
 router.get("/recoveraccount", async (req, res) => {
     res.render("recover");

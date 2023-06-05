@@ -40,7 +40,22 @@ export const getACartById = async (req, res) => {
 //Añade un carrito al array.
 export const addACart = async (req,res) => {
     let products = req.body; 
-    let newCart;
+
+    const user = req.session.user;
+    
+    //Se filtran los productos para quitar lo creado por el premium
+    if (user.role === 'premium') {
+        const removedProducts = products.filter(product => product.owner === user.email);
+        products = products.filter(product => product.owner !== user.email);
+    
+        // Notificar los productos eliminados
+        if (removedProducts.length > 0) {
+          console.log('Se eliminaron los siguientes productos porque los premium no pueden añadir los que crearon:');
+          removedProducts.forEach(product => {
+            console.log('- ' + product.name);
+          });
+        }
+    }
 
     try{
         if (!config.useFS) {

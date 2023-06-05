@@ -4,6 +4,10 @@ const customError = (number, error) => {
             console.error('Bad request: ', error);
             break;
 
+        case 401:
+            console.error('Unauthorized: ', error);
+            break;
+
         case 404:
             console.error('File not (or not able to be) found: ', error);
             break;

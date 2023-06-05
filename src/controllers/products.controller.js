@@ -51,6 +51,14 @@ export const getAProductById = async (req, res) => {
 //Añade un producto al array
 export const addAProduct = async (req, res) => {
   const product = req.body;
+
+  //Se añade al creador del producto. 
+  const owner = req.session.user.email;
+  if (owner != config.adminName){
+    product.owner = owner;
+  }
+  
+
   try {
     if (!config.useFS){
       await addProduct(product);
@@ -70,6 +78,13 @@ export const addAProduct = async (req, res) => {
 //Se borra un producto especifico por ID
 export const deleteAProduct = async (req, res) => {
     let pid = parseInt(req.params.pid);
+
+    //Se hace un chequeo extra para ver si es un usuario autorizado para este producto en especifico
+    const userMail = req.session.user.email;
+    const product = config.useFS ? productManager.getProductById(pid) : await getProductById(pid);
+    if (userMail != product.owner || userMail != config.adminName){
+      customError(401, "You are neither the owner or an admin to do this.")
+    }
 
     //Se verifica si existe y lo borra, sino manda error.
     try {
