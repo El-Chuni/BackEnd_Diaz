@@ -20,6 +20,8 @@ import initializePassport from './config/passport.config.js';
 import cors from 'cors';
 import { addLogger } from './config/logger.js';
 import cookieParser from 'cookie-parser';
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUiExpress from 'swagger-ui-express';
 
 
 //Se hace lo necesario para activar el server
@@ -61,6 +63,21 @@ app.use(session({
   saveUninitialized:true
 }));
 
+//Se define el swagger
+const options = {
+  definition: {
+    openapi: '3.0.1',
+    info: {
+      title: 'Back-End Diaz',
+      version: '1.0.0',
+      description: 'API para la clase de Back-End',
+    },
+  },
+  apis: [`./docs/**/*.yaml`] 
+};
+
+const specs = swaggerJSDoc(options);
+
 //Se inicia el pasaporte
 initializePassport();
 app.use(passport.initialize());
@@ -71,6 +88,7 @@ app.use('/views', viewsRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/user', userRouter);
 app.use('/api/sessions', sessionRouter);
+app.use('/apidocs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 
 //Se inicia el Websocket server
 socketServer.on('connection', (socket) => {

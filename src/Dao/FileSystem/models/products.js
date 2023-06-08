@@ -10,6 +10,7 @@ export default class Product {
         this.id = id;
         this.status = status;
         this.category = category;
+        this.owner = owner;
     }
     
 }

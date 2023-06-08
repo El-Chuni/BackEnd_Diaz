@@ -1,0 +1,138 @@
+paths:
+  /api/products/:
+    get:
+      summary: Renderiza el handlebars Home mostrando una lista de productos.
+      tags:
+        - Products
+        - List
+      responses:
+        "200":
+          description: Se imprimió la lista de productos del filesystem o del Mongo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#Dao/DB/Models/products.js'
+        "500":
+          description: No se puede obtener la lista pedida.
+  paths:
+  /api/products/get/:
+    get:
+      summary: Obtiene una lista de productos según parámetros de búsqueda.
+      tags:
+        - Products
+        - List
+        - OnlyMongo
+      parameters:
+        - in: query
+          name: limit
+          description: Número máximo de productos a obtener.
+          schema:
+            type: integer
+        - in: query
+          name: page
+          description: Número de página de resultados.
+          schema:
+            type: integer
+        - in: query
+          name: query
+          description: Cadena de búsqueda para filtrar los productos.
+          schema:
+            type: string
+        - in: query
+          name: sort
+          description: Campo utilizado para ordenar los productos.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Éxito. Devuelve la lista de productos según los parámetros especificados.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#Dao/DB/Models/products.js'
+        "404":
+          description: No se encontraron productos que coincidan con los parámetros de búsqueda.
+        "500":
+          description: Error interno del servidor.
+  /api/products/forbidden/:
+    get:
+      summary: Avisa al usuario que no puede acceder a algo.
+      tags:
+        - Access
+        - Forbidden
+      parameters:
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: integer
+            description: ID del producto
+      responses:
+        "401":
+          description: No estás autorizado para esta acción.
+  /api/products/get/{pid}:
+    get:
+      summary: Obtiene un producto especifico buscando por ID.
+      tags:
+        - Product
+      responses:
+        "200":
+          description: Producto encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#Dao/DB/Models/products.js'
+        "404":
+          description: Producto no encontrado
+
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+          description: Id autogenerado en Mongo
+        title:
+          type: string
+          description: Nombre del producto
+          required: true
+        description:
+          type: string
+          description: Descripción del producto
+          required: true
+        price:
+          type: number
+          description: Precio del producto
+          required: true
+        thumbnail:
+          type: string
+          description: URL de la imagen del producto
+          required: true
+        code:
+          type: string
+          description: Un codigo unico para el producto, no se puede repetir
+          unique: true
+          required: true
+        stock:
+          type: number
+          description: Stock del producto
+          required: true
+        category:
+          type: string
+          description: Categoría del producto
+          required: true
+        status:
+          type: boolean
+          description: Estado del producto (true/false)
+          required: true
+          default: true
+        owner:
+          type: string
+          description: Creador/a del producto
+          default: admin
