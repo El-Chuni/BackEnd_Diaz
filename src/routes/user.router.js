@@ -55,7 +55,7 @@ router.get("/", (req, res) =>{
     });
 });
 
-router.get("/premium/:uid", passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), async (req, res) =>{
+router.put("/premium/:uid", passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), async (req, res) =>{
     let uid = req.params.uid;
     const user = await userModel.findById(uid);
     let changeRoleTo = 'user';
