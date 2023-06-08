@@ -13,7 +13,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#Dao/DB/Models/products.js'
+                  $ref: '#/components/schemas/Product'
         "500":
           description: No se puede obtener la lista pedida.
   paths:
@@ -53,7 +53,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#Dao/DB/Models/products.js'
+                  $ref: '#/components/schemas/Product'
         "404":
           description: No se encontraron productos que coincidan con los parámetros de búsqueda.
         "500":
@@ -64,13 +64,6 @@ paths:
       tags:
         - Access
         - Forbidden
-      parameters:
-        - in: path
-          name: pid
-          required: true
-          schema:
-            type: integer
-            description: ID del producto
       responses:
         "401":
           description: No estás autorizado para esta acción.
@@ -79,13 +72,89 @@ paths:
       summary: Obtiene un producto especifico buscando por ID.
       tags:
         - Product
+      parameters:
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: integer
+            description: ID del producto
       responses:
         "200":
           description: Producto encontrado.
           content:
             application/json:
               schema:
-                $ref: '#Dao/DB/Models/products.js'
+                $ref: '#/components/schemas/Product'
+        "404":
+          description: Producto no encontrado
+  /api/products/mockingproducts:
+    get:
+      summary: Se generan y obtienen productos genericos de mock.
+      tags:
+        - Product
+        - mock
+      responses:
+        "200":
+          description: Se imprime la lista de productos mockeados genericos.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        "500":
+          description: Se produce un error haciendo los productos.
+  /api/products/post:
+    post:
+      summary: Añade un nuevo producto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        "200":
+          description: Producto añadido exitosamente
+        "400":
+          description: Error al añadir el producto
+  /api/products/delete/{pid}:
+    delete:
+      summary: Borra un producto por ID
+      parameters:
+        - in: path
+          name: pid
+          required: true
+          description: ID del producto a borrar
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Producto borrado exitosamente
+        "401":
+          description: No estás autorizado para borrar este producto
+        "404":
+          description: Producto no encontrado
+  /api/products/put/{pid}:
+    put:
+      summary: Actualiza un producto por ID
+      parameters:
+        - in: path
+          name: pid
+          required: true
+          description: ID del producto a actualizar
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdate'
+      responses:
+        "200":
+          description: Producto actualizado exitosamente
         "404":
           description: Producto no encontrado
 
