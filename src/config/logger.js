@@ -1,6 +1,6 @@
 import winston, { transports } from "winston";
 import config from "./config.js";
-require('colors');
+//require('colors');
 
 //Custom logger options:
 const customLevelsOptions = {

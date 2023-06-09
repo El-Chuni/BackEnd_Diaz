@@ -16,7 +16,6 @@ paths:
                   $ref: '#/components/schemas/Product'
         "500":
           description: No se puede obtener la lista pedida.
-  paths:
   /api/products/get/:
     get:
       summary: Obtiene una lista de productos según parámetros de búsqueda.
