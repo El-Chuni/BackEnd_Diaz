@@ -1,0 +1,268 @@
+paths:
+  /api/carts/forbidden/:
+    get:
+      summary: Avisa al usuario que no puede acceder a algo.
+      tags:
+        - Access
+        - Forbidden
+      responses:
+        "401":
+          description: No estás autorizado para esta acción.
+  
+  /api/carts/get:
+    get:
+      summary: Obtener todos los carritos
+      responses:
+        '200':
+          description: Carga una lista de carritos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cart'
+    
+  /api/carts/get/{cid}:
+    get:
+      summary: Obtiene un carrito específico por ID
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+          description: ID del carrito a obtener
+      responses:
+        '200':
+          description: Carrito encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '404':
+          description: El carrito no existe
+  
+  /api/carts/post:
+    post:
+      summary: Añade un carrito
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                products:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      product:
+                        type: string
+                        description: ID del producto
+                      quantity:
+                        type: number
+                        description: Cantidad del producto
+              required:
+                - products
+      responses:
+        '200':
+          description: Carrito creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '500':
+          description: Error al crear el carrito
+  
+  /api/carts/post/{cid}/product/{pid}:
+    post:
+      summary: Añade un producto específico a cierto carrito
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+          description: ID del carrito
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: string
+          description: ID del producto
+      responses:
+        '200':
+          description: Producto añadido al carrito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '404':
+          description: El carrito no existe
+  
+  /api/carts/put/{cid}:
+    put:
+      summary: Reemplaza el contenido del carrito
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+          description: ID del carrito
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                products:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      product:
+                        type: string
+                        description: ID del producto
+                      quantity:
+                        type: number
+                        description: Cantidad del producto
+              required:
+                - products
+      responses:
+        '200':
+          description: Carrito actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '500':
+          description: Error al actualizar el carrito
+  
+  /api/carts/put/{cid}/products/{pid}:
+    put:
+      summary: Actualiza el stock de un producto en un carrito
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+          description: ID del carrito
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: string
+          description: ID del producto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                stock:
+                  type: number
+                  description: Nuevo stock del producto
+              required:
+                - stock
+      responses:
+        '200':
+          description: Carrito actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '500':
+          description: Error al actualizar el stock del producto
+  
+  /api/carts/delete/{cid}/products/{pid}:
+    delete:
+      summary: Eliminar un producto del carrito
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+          description: ID del carrito
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: string
+          description: ID del producto
+      responses:
+        '200':
+          description: Producto eliminado del carrito
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cart'
+        '500':
+          description: Error al eliminar el producto del carrito
+  
+  /api/carts/delete/{cid}:
+    delete:
+      summary: Elimina un carrito
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+          description: ID del carrito
+      responses:
+        '200':
+          description: Carrito eliminado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cart'
+        '500':
+          description: Error al eliminar el carrito
+  
+  /api/carts/{cid}/purchase:
+    post:
+      summary: Finaliza la compra y envia el ticket al usuario
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+          description: ID del carrito
+      responses:
+        '200':
+          description: Compra finalizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+          description: Id autogenerado en Mongo
+        products:
+          type: array
+          description: Los productos en el carrito
+          items:
+            type: object
+            properties:
+              product:
+                type: ObjectId
+                description: Id del producto
+              quantity:
+                type: number
+                description: Cantidad del producto en el carrito
+          required: true
+        
