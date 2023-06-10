@@ -107,6 +107,9 @@ paths:
   /api/products/post:
     post:
       summary: Añade un nuevo producto
+      tags:
+        - Products
+        - Post
       requestBody:
         required: true
         content:
@@ -121,6 +124,9 @@ paths:
   /api/products/delete/{pid}:
     delete:
       summary: Borra un producto por ID
+      tags:
+        - Products
+        - Delete
       parameters:
         - in: path
           name: pid
@@ -138,6 +144,9 @@ paths:
   /api/products/put/{pid}:
     put:
       summary: Actualiza un producto por ID
+      tags:
+        - Products
+        - Put
       parameters:
         - in: path
           name: pid

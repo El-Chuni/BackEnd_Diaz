@@ -12,6 +12,9 @@ paths:
   /api/carts/get:
     get:
       summary: Obtener todos los carritos
+      tags:
+        - Carts
+        - List
       responses:
         '200':
           description: Carga una lista de carritos
@@ -25,6 +28,8 @@ paths:
   /api/carts/get/{cid}:
     get:
       summary: Obtiene un carrito específico por ID
+      tags:
+        - Carts
       parameters:
         - in: path
           name: cid
@@ -45,6 +50,9 @@ paths:
   /api/carts/post:
     post:
       summary: Añade un carrito
+      tags:
+        - Carts
+        - Post
       requestBody:
         required: true
         content:
@@ -77,6 +85,9 @@ paths:
   /api/carts/post/{cid}/product/{pid}:
     post:
       summary: Añade un producto específico a cierto carrito
+      tags:
+        - Carts
+        - Post
       parameters:
         - in: path
           name: cid
@@ -103,6 +114,9 @@ paths:
   /api/carts/put/{cid}:
     put:
       summary: Reemplaza el contenido del carrito
+      tags:
+        - Carts
+        - Put
       parameters:
         - in: path
           name: cid
@@ -142,6 +156,9 @@ paths:
   /api/carts/put/{cid}/products/{pid}:
     put:
       summary: Actualiza el stock de un producto en un carrito
+      tags:
+        - Carts
+        - Put
       parameters:
         - in: path
           name: cid
@@ -179,6 +196,9 @@ paths:
   /api/carts/delete/{cid}/products/{pid}:
     delete:
       summary: Eliminar un producto del carrito
+      tags:
+        - Carts
+        - Delete
       parameters:
         - in: path
           name: cid
@@ -207,6 +227,9 @@ paths:
   /api/carts/delete/{cid}:
     delete:
       summary: Elimina un carrito
+      tags:
+        - Carts
+        - Delete
       parameters:
         - in: path
           name: cid
@@ -229,6 +252,10 @@ paths:
   /api/carts/{cid}/purchase:
     post:
       summary: Finaliza la compra y envia el ticket al usuario
+      tags:
+        - Carts
+        - Post
+        - Ticket
       parameters:
         - in: path
           name: cid

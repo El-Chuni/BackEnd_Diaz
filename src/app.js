@@ -73,7 +73,7 @@ const options = {
       description: 'API para la clase de Back-End',
     },
   },
-  apis: ["./docs/**/*.yaml"] 
+  apis: ["./src/docs/**/*.yaml"] 
 };
 
 const specs = swaggerJSDoc(options);
