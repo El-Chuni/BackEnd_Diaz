@@ -1,6 +1,7 @@
 import { Router } from "express";
 import passport from "passport";
 import userModel from "../Dao/DB/models/user.js";
+import customError from "../controllers/error.controller.js";
 
 const router = Router();
 
@@ -55,12 +56,12 @@ router.get("/", (req, res) =>{
     });
 });
 
-router.put("/premium/:uid", passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), async (req, res) =>{
+router.get("/premium/:uid", passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), async (req, res) =>{
     let uid = req.params.uid;
     const user = await userModel.findById(uid);
-    let changeRoleTo = 'user';
+    let changeRoleTo = 'usuario';
 
-    if (user.role == 'user'){
+    if (user.role == 'usuario'){
         changeRoleTo = 'premium';
     } 
 
@@ -70,7 +71,8 @@ router.put("/premium/:uid", passport.authenticate('onlyAdmin', { failureRedirect
 
 //Un aviso si la autentificación falla en ciertas funciones
 router.get('/forbidden', async (req,res) => {
-    res.send("No estás autorizado para ejecutar cambios acá.")
+    res.send("No estás autorizado para ejecutar cambios acá.");
+    customError(401, "No estás autorizado para ejecutar cambios acá.");
 })
 
 router.get("/recoveraccount", async (req, res) => {

@@ -3,6 +3,7 @@ import multer from "multer";
 import passport from "passport";
 import { addAProduct, deleteAProduct, getAProductById, getProductsByParameters, getProductsList, updateAProduct } from "../controllers/products.controller.js";
 import { generateMockProducts } from "../controllers/mocker.controller.js";
+import customError from "../controllers/error.controller.js";
 
 //Se define el router
 const router = Router();
@@ -19,7 +20,8 @@ router.get('/', getProductsList);
 
 //Un aviso si la autentificación falla en ciertas funciones
 router.get('/forbidden', async (req,res) => {
-    res.send("No estás autorizado para ejecutar cambios acá.")
+    res.send("No estás autorizado para ejecutar cambios acá.");
+    customError(401, "No estás autorizado para ejecutar cambios acá.");
 })
 
 //Carga y muestra un producto en particular

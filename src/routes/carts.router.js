@@ -12,7 +12,8 @@ const upload = multer({ storage });
 
 //Un aviso si la autentificación falla en ciertas funciones
 router.get('/forbidden', async (req,res) => {
-    res.send("No estás autorizado para ejecutar cambios acá.")
+    res.send("No estás autorizado para ejecutar cambios acá.");
+    customError(401, "No estás autorizado para ejecutar cambios acá.");
 })
 
 //Carga y muestra cada carrito

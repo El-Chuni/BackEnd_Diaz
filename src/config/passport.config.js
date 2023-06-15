@@ -52,7 +52,7 @@ const initializePassport = () => {
     passport.use('register', new localStrategy(
         {passReqToCallback: true, usernameField: 'email'}, async (req, username, password, done) => {
             const {first_name, last_name, email, age} = req.body;
-            let role = "user";
+            let role = "usuario";
             try {
                 const exists = await userModel.findOne({email});
                 if (exists){
@@ -102,85 +102,45 @@ const initializePassport = () => {
         })
     );
 
-    passport.use('onlyAdmin', new localStrategy({usernameField: 'username'},
-      async (username, done) => {
-        if (username == config.adminName) {
-            //Se confirma que es admin y permite el acceso
-            return done(null, config.adminName);
-        }else{
-            //Caso contrario.
-            console.warn("Access denied, only admin can use this.")
-            return done(null, false);
+    passport.use('onlyAdmin', new localStrategy({ passReqToCallback: true },
+        async (req, username, password, done) => {
+            if (req.session.user && req.session.user.role === 'admin') {
+                // El usuario tiene el rol de administrador, se permite el acceso
+                return done(null, req.session.user);
+            } else {
+                // El usuario no tiene el rol de administrador, se deniega el acceso
+                console.warn("Access denied, only admin can use this.")
+                return done(null, false);
+            }
         }
-      }
     ));
-
-    passport.use('onlyUser',new localStrategy({usernameField: 'username'},
-      async (username, done) => {
-        if (username !== config.adminName) {
-            //Se confirma que es usuario y permite el acceso
-            return done(null, {username: username});
-        }else{
-            //Caso contrario.
+      
+    passport.use('onlyUser', new localStrategy({ passReqToCallback: true },
+        async (req, username, password, done) => {
+          if (req.session.user && req.session.user.role !== 'admin') {
+            // El usuario no tiene el rol de administrador, se permite el acceso
+            return done(null, req.session.user);
+          } else {
+            // El usuario tiene el rol de administrador, se deniega el acceso
             console.warn("Access denied, only user can use this.")
             return done(null, false);
+          }
         }
-      }
     ));
-
-    passport.use('forbiddenForCommonUser', new localStrategy({ usernameField: 'username' },
-        async (username, done) => {
-            try {
-                const user = await userModel.findOne({ username: username });
-                if (!user) {
-                  return done(null, false);
-                }
-
-                if (user.role !== 'usuario') {
-                    return done(null, user);
-                } else {
-                    console.warn("Access denied, only premium or admin users are allowed.");
-                    return done(null, false);
-                }
-            } catch (error) {
-                return done(error);
-            }
-        }  
+      
+    passport.use('forbiddenForCommonUser', new localStrategy({ passReqToCallback: true },
+        async (req, username, password, done) => {
+          if (req.session.user && req.session.user.role !== 'usuario') {
+            // El usuario no tiene el rol de usuario, se permite el acceso
+            return done(null, req.session.user);
+          } else {
+            // El usuario tiene el rol de usuario, se deniega el acceso
+            console.warn("Access denied, only premium or admin users are allowed.");
+            return done(null, false);
+          }
+        }
     ));
-    
-    /*passport.use('onlyProductOwner', new localStrategy({ usernameField: 'username' },
-        async (username, done) => {
-            try {
-                const user = await userModel.findOne({ username: username });
-                if (!user) {
-                  return done(null, false);
-                }
-
-                switch (user.role) {
-                    case 'usuario':
-                        console.warn("Access denied, only owner or admin users are allowed.");
-                        return done(null, false);
-                        break;
-                    
-                    case 'premium':
-                        if ()
-                        break;
-                    
-                    default:
-                        return done(null, user);
-                        break;
-                }
-
-                if (user.role !== 'usuario') {
-
-                    
-                } else {
-                    
-                }
-            } catch (error) {
-                return done(error);
-            }
-        }))*/
+      
 
     //Funciones de Serializacion y Desserializacion
     passport.serializeUser((user, done) => {
