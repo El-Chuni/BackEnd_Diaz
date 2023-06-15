@@ -1,9 +1,13 @@
 import chai from "chai";
 import supertest from "supertest";
-import __dirname from "../src/utils";
+import __dirname from "../src/utils.js";
+import mongoose from "mongoose";
+import config from "../src/config/config.js";
 
 const expect = chai.expect
 const requester = supertest(__dirname);
+
+await mongoose.connect(config.mongoUrl);
 
 describe("Testing BackEnd Project App", () => {
     describe("Testing Products Api", () => {
@@ -24,6 +28,13 @@ describe("Testing BackEnd Project App", () => {
                 console.error('Failed to login before tests:', error);
             }
         });
+
+        beforeEach(function(){
+            this.timeout(5000);
+            mongoose.connection.collections.users.drop();
+            mongoose.connection.collections.products.drop();
+        });
+
         it("Crear Producto: El API /api/products/post debe crear un producto correctamente si lo recibe desde un usuario premium o admin", async () =>{
             //Given:
             const productMock = {
@@ -93,6 +104,10 @@ describe("Testing BackEnd Project App", () => {
             expect(_body).to.be.an('array');
             expect(_body).to.be.greaterThan(0);
         });
+
+        afterEach(function(){
+            mongoose.connection.collections.products.drop();
+        });
     });
 
     describe("Testing Carts Api", () => {
@@ -113,6 +128,13 @@ describe("Testing BackEnd Project App", () => {
                 console.error('Failed to login before tests:', error);
             }
         });
+
+        beforeEach(function(){
+            this.timeout(5000);
+            mongoose.connection.collections.users.drop();
+            mongoose.connection.collections.carts.drop();
+        });
+        
         it("Crear Carrito Vacio: El API /api/carts/post debe crear un carrito", async () =>{
             //Given:
             const cartMock = {
@@ -170,6 +192,10 @@ describe("Testing BackEnd Project App", () => {
             expect(statusCode).to.eql(200);
             expect(_body.payload).is.ok.and.to.have.property('_id');
         });
+
+        afterEach(function(){
+            mongoose.connection.collections.carts.drop();
+        });
     });
 
     describe("Testing login and session with Cookies:", () => {
@@ -182,6 +208,11 @@ describe("Testing BackEnd Project App", () => {
                 password: "Mameme",
                 age: 22
             };
+        });
+
+        beforeEach(function(){
+            this.timeout(5000);
+            mongoose.connection.collections.users.drop();
         });
 
         //Aclaración: Session se usa para saludar si el usuario está conectado, yo en su lugar uso User.
@@ -229,11 +260,15 @@ describe("Testing BackEnd Project App", () => {
             //Given:
             
             //Then:
-            const {statusCode} = await requester.get("/api/users/premium").set('Cookie', [`${this.cookie.name}=${this.cookie.value}`]);
+            const {statusCode} = await requester.get("/api/users/premium");
             console.log(statusCode);
 
             //AssertThat:
             expect(statusCode).is.eqls(401);
+        });
+
+        afterEach(function(){
+            mongoose.connection.collections.users.drop();
         });
     });
 

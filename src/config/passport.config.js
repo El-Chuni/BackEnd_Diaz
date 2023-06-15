@@ -101,14 +101,18 @@ const initializePassport = () => {
             }
         })
     );
+    
+    //
+    //NOTA: Revisar seriamente los passports use de acceso de los roles de usuario
+    //
 
     passport.use('onlyAdmin', new localStrategy({ passReqToCallback: true },
         async (req, username, password, done) => {
             if (req.session.user && req.session.user.role === 'admin') {
-                // El usuario tiene el rol de administrador, se permite el acceso
+                //El usuario tiene el rol de administrador, se permite el acceso
                 return done(null, req.session.user);
             } else {
-                // El usuario no tiene el rol de administrador, se deniega el acceso
+                //El usuario no tiene el rol de administrador, se deniega el acceso
                 console.warn("Access denied, only admin can use this.")
                 return done(null, false);
             }
@@ -118,10 +122,10 @@ const initializePassport = () => {
     passport.use('onlyUser', new localStrategy({ passReqToCallback: true },
         async (req, username, password, done) => {
           if (req.session.user && req.session.user.role !== 'admin') {
-            // El usuario no tiene el rol de administrador, se permite el acceso
+            //El usuario no tiene el rol de administrador, se permite el acceso
             return done(null, req.session.user);
           } else {
-            // El usuario tiene el rol de administrador, se deniega el acceso
+            //El usuario tiene el rol de administrador, se deniega el acceso
             console.warn("Access denied, only user can use this.")
             return done(null, false);
           }
@@ -131,10 +135,10 @@ const initializePassport = () => {
     passport.use('forbiddenForCommonUser', new localStrategy({ passReqToCallback: true },
         async (req, username, password, done) => {
           if (req.session.user && req.session.user.role !== 'usuario') {
-            // El usuario no tiene el rol de usuario, se permite el acceso
+            //El usuario no tiene el rol de usuario, se permite el acceso
             return done(null, req.session.user);
           } else {
-            // El usuario tiene el rol de usuario, se deniega el acceso
+            //El usuario tiene el rol de usuario, se deniega el acceso
             console.warn("Access denied, only premium or admin users are allowed.");
             return done(null, false);
           }
