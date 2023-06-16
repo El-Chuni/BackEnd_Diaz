@@ -212,7 +212,6 @@ describe("Testing BackEnd Project App", () => {
 
         beforeEach(function(){
             this.timeout(5000);
-            mongoose.connection.collections.users.drop();
         });
 
         //Aclaración: Session se usa para saludar si el usuario está conectado, yo en su lugar uso User.
@@ -260,15 +259,11 @@ describe("Testing BackEnd Project App", () => {
             //Given:
             
             //Then:
-            const {statusCode} = await requester.get("/api/users/premium");
+            const {statusCode} = (await requester.get("/api/users/premium"));
             console.log(statusCode);
 
             //AssertThat:
             expect(statusCode).is.eqls(401);
-        });
-
-        afterEach(function(){
-            mongoose.connection.collections.users.drop();
         });
     });
 
