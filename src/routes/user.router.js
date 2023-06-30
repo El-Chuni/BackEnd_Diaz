@@ -30,7 +30,8 @@ router.post("/post/login", passport.authenticate('login',{failureRedirect:'/fail
         name : `${user.first_name} ${user.last_name}`,
         email: user.email,
         age: user.age
-    }
+    };
+    await userModel.findByIdAndUpdate(user._id, { last_connection: Date.now()});
     res.send({status:"success", payload:req.session.user, message:"¡Primer logueo realizado! :)" });
 });
 
@@ -93,13 +94,20 @@ router.get("/changePassword", async (req, res) => {
 });
 
 //Se acaba la sessión
-router.get("/logout", (req, res) => {
-    req.session.destroy(error => {
-        if (error){
-            res.json({error: "error logout", mensaje: "Error al cerrar la sesion"});
-        }
-        res.render("login");
-    });
+router.get("/logout", async (req, res) => {
+    try {
+        const user = req.session.user;
+    
+        // Destruimos la sesión e informamos cuando se logeó por última vez esta persona
+        req.session.destroy();
+        await userModel.findByIdAndUpdate(user._id, { last_connection: Date.now() });
+    
+        // Redireccionamos o enviamos una respuesta, dependiendo de tus necesidades
+        res.render("/login");
+    } catch (error) {
+        console.error("Error al cerrar la sesión:", error);
+        res.status(500).json({ error: "error_logout", message: "Error al cerrar la sesión" });
+    }
 });
 
 

@@ -16,6 +16,17 @@ const schema = new mongoose.Schema({
         type: String,
         default: "usuario",
         enum: ["usuario", "admin", "premium"]
+    },
+    documents: {
+        type: [{
+            name: String,
+            reference: String
+        }],
+        default: []
+    },
+    last_connection: {
+        type: Date,
+        default: Date.now
     }
 })
 
