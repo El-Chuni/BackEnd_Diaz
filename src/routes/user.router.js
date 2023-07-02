@@ -12,13 +12,26 @@ const router = Router();
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const uid = req.params.uid;
-        //Define a cual carpeta va el documento
+        const userFolder = path.join(__dirname, 'src', 'public', 'userDocs', uid);
+
+        //Crea la carpeta del usuario si no existe
+        if (!fs.existsSync(userFolder)) {
+            fs.mkdirSync(userFolder);
+        }
+
+        //Define a cual subcarpeta va el documento
         const folder = req.body.documentType === 'profile' ? 'profiles' :
             req.body.documentType === 'product' ? 'products' :
             req.body.documentType === 'document' ? 'documents' :
             '';
 
-        const destinationPath = path.join(__dirname, 'src', 'docs', 'userDocs', uid, folder);
+        const destinationPath = path.join(userFolder, folder);
+
+        // Crea la subcarpeta si no existe
+        if (!fs.existsSync(destinationPath)) {
+            fs.mkdirSync(destinationPath);
+        }
+
         cb(null, destinationPath);
     },
     filename: (req, file, cb) => {
