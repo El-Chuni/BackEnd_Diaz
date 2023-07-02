@@ -108,7 +108,8 @@ const initializePassport = () => {
 
     passport.use('onlyAdmin', new localStrategy({ passReqToCallback: true },
         async (req, username, password, done) => {
-            if (req.session.user && req.session.user.role === 'admin') {
+            const user = await userModel.findOne({email: username});
+            if (user && user.role === 'admin') {
                 //El usuario tiene el rol de administrador, se permite el acceso
                 return done(null, req.session.user);
             } else {
@@ -121,27 +122,29 @@ const initializePassport = () => {
       
     passport.use('onlyUser', new localStrategy({ passReqToCallback: true },
         async (req, username, password, done) => {
-          if (req.session.user && req.session.user.role !== 'admin') {
-            //El usuario no tiene el rol de administrador, se permite el acceso
-            return done(null, req.session.user);
-          } else {
-            //El usuario tiene el rol de administrador, se deniega el acceso
-            console.warn("Access denied, only user can use this.")
-            return done(null, false);
-          }
+            const user = await userModel.findOne({email: username});
+            if (user && user.role !== 'admin') {
+                //El usuario no tiene el rol de administrador, se permite el acceso
+                return done(null, req.session.user);
+            } else {
+                //El usuario tiene el rol de administrador, se deniega el acceso
+                console.warn("Access denied, only user can use this.")
+                return done(null, false);
+            }
         }
     ));
       
     passport.use('forbiddenForCommonUser', new localStrategy({ passReqToCallback: true },
         async (req, username, password, done) => {
-          if (req.session.user && req.session.user.role !== 'usuario') {
-            //El usuario no tiene el rol de usuario, se permite el acceso
-            return done(null, req.session.user);
-          } else {
-            //El usuario tiene el rol de usuario, se deniega el acceso
-            console.warn("Access denied, only premium or admin users are allowed.");
-            return done(null, false);
-          }
+            const user = await userModel.findOne({email: username});
+            if (user && user.role !== 'usuario') {
+                //El usuario no tiene el rol de usuario, se permite el acceso
+                return done(null, req.session.user);
+            } else {
+                //El usuario tiene el rol de usuario, se deniega el acceso
+                console.warn("Access denied, only premium or admin users are allowed.");
+                return done(null, false);
+            }
         }
     ));
       

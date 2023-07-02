@@ -2,14 +2,37 @@ import { Router } from "express";
 import passport from "passport";
 import userModel from "../Dao/DB/models/user.js";
 import customError from "../controllers/error.controller.js";
+import multer from "multer";
+import __dirname from "../utils.js";
 
 const router = Router();
+
+//Se define como será el almacenamiento
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uid = req.params.uid;
+        //Define a cual carpeta va el documento
+        const folder = req.body.documentType === 'profile' ? 'profiles' :
+            req.body.documentType === 'product' ? 'products' :
+            req.body.documentType === 'document' ? 'documents' :
+            '';
+
+        const destinationPath = path.join(__dirname, 'src', 'docs', 'userDocs', uid, folder);
+        cb(null, destinationPath);
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname);
+    }
+});
+
+
+const upload = multer({ storage });
 
 //Registramos al usuario
 router.post("/post/register", passport.authenticate('register',{failureRedirect:'/failregister'}), async (req, res)=>{
     res.status(201).send({status: "success", message: "Usuario creado con extito con ID: " + req.user.id});
 });
-
 
   
 router.get("/register", (req, res) => {
@@ -57,17 +80,65 @@ router.get("/", (req, res) =>{
     });
 });
 
+//Sube el archivo (documento) y marca al usuario con el nombre y dirección de lo que se subió
+router.post("/:uid/documents", upload.single("document"), async (req, res) => {
+    //Este router también usa un valor string de req.body llamado
+    //documentType que define que tipo de archivo se sube
+    //pero se usa en el middleware de upload.single("document").
+    //Se escribe este comentario como advertencia ya que no
+    //se usa dicho valor en el router fuera del middleware
+    const uid = req.params.uid;
+    const file = req.file;
+  
+    try {
+      const user = await userModel.findById(uid);
+      if (!user) {
+        return customError(404, "The user doesn't exist");
+      }
+  
+      // Verificar si se recibió un archivo
+      if (!file) {
+        return customError(400, "No file was uploaded");
+      }
+  
+      // Obtener el nombre y la referencia del archivo
+      const documentName = req.body.name;
+      const reference = path.join(file.destination, file.filename);
+  
+      // Agregar el documento al usuario
+      user.documents.push({ name: documentName, reference });
+      await user.save();
+  
+      res.status(200).send({ message: "Document uploaded to the user." });
+    } catch (error) {
+      customError(500, error.message);
+    }
+  });
+
+//Cambia el rol de usuario a premium y viceversa
 router.get("/premium/:uid", passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), async (req, res) =>{
     let uid = req.params.uid;
     const user = await userModel.findById(uid);
+    
+    //Verifica si tiene los documentos necesarios
+    const requiredDocs = ["Identificación", "Comprobante de domicilio", "Comprobante de estado de cuenta"];
+    const itHasTheDocs = requiredDocs.every((documentName) => {
+        return user.documents.some((document) => document.name === documentName);
+    });
+
     let changeRoleTo = 'usuario';
 
-    if (user.role == 'usuario'){
-        changeRoleTo = 'premium';
-    } 
+    if (itHasTheDocs){
+        if (user.role == 'usuario'){
+            changeRoleTo = 'premium';
+        }
 
-    await userModel.findOneAndUpdate({_id: user._id}, {role: changeRoleTo});
-    res.send(`El usuario con ID ${uid} ahora es un ${changeRoleTo}.`);
+        await userModel.findOneAndUpdate({_id: user._id}, {role: changeRoleTo});
+        res.status(200).send(`El usuario con ID ${uid} ahora es un ${changeRoleTo}.`);
+    } else {
+        customError(401, "The user doesn't have the requisites to become a premium");
+    }
+
 });
 
 //Un aviso si la autentificación falla en ciertas funciones
