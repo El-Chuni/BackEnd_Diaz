@@ -86,11 +86,35 @@ router.get("/callback", passport.authenticate('github', {failureRedirect:'/login
     res.redirect('/');
 });
 
-//Muestra el usuario y algunos datos
-router.get("/", (req, res) =>{
-    res.render("profile", {
-        user: req.session.user
-    });
+//Muestra los datos de los usuarios del sitio web
+router.get("/", async (req, res) =>{
+    let page = parseInt(req.query.page);
+    if(!page) page=1;
+
+    let content = await userModel.paginate({},{page,limit:10,lean:true});
+    content.prevLink = content.hasPrevPage?`http://localhost:9090/products?page=${content.prevPage}`:'';
+    content.nextLink = content.hasNextPage?`http://localhost:9090/products?page=${content.nextPage}`:'';
+    content.isValid= !(page<=0||page>content.totalPages);
+
+    res.render("usersList", {content});
+});
+
+//Borra los usuarios que no se hayan conectado desde hace dos días
+router.delete("/", async (req, res) =>{
+    let timeLimit = Date.now() - (2 * 24 * 60 * 60 * 1000);
+
+    try {
+        const expiredUsers = await userModel.find({ last_connection: { $lt: twoDaysAgo } });
+      
+        // Borrar los usuarios encontrados
+        for (const user of expiredUsers) {
+          await user.remove();
+        }
+      
+        console.log(`Se han eliminado ${expiredUsers.length} usuarios con última conexión anterior a 2 días.`);
+    } catch (error) {
+        console.error('Error al eliminar usuarios:', error);
+    }
 });
 
 //Sube el archivo (documento) y marca al usuario con el nombre y dirección de lo que se subió
