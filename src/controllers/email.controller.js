@@ -14,11 +14,11 @@ const transporter = nodemailer.createTransport({
 
 transporter.verify(function(error, success) {
     if (error) {
-          console.log(error);
+        console.log(error);
     } else {
-          console.log('Server is ready to take our messages');
+        console.log('Server is ready to take our messages');
     }
-  });
+});
 
 const mailOptions = {
     from: "Coder Test " + config.gmailAccount,
@@ -27,26 +27,6 @@ const mailOptions = {
     html: "<div><h1>Esto es un Test de envio de correos con Nodemailer!</h1></div>",
     attachments: []
 }
-
-
-/*const mailOptionsWithAttachments = {
-    from: "Coder Test " + config.gmailAccount,
-    to: config.gmailAccount,
-    subject: "Correo de prueba Coderhouse Programacion Backend clase 30.",
-    html: `<div>
-                <h1>Esto es un Test de envio de correos con Nodemailer!</h1>
-                <p>Ahora usando imagenes: </p>
-                <img src="cid:meme"/>
-            </div>`,
-    attachments: [
-        {
-            filename: 'Meme de Programacion',
-            path: __dirname+'/public/images/meme.png',
-            cid: 'meme'
-        }
-    ]
-}*/
-
 
 
 
@@ -87,19 +67,13 @@ export const sendTicketByEmail = async (ticketId, email) => {
 };
   
 
-export const sendEmail = (req, res) => {
+export const sendEmail = async (mail, mailDestination) => {
     try {
-        let result = transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.log(error);
-                res.status(400).send({message: "Error", payload: error});
-            }
-            console.log('Message sent: %s', info.messageId);
-            res.send({message: "Success!", payload: info});
-        });
+        await transporter.sendMail(mail);
+        console.log('Message sent to', mailDestination);
     } catch (error) {
         console.error(error);
-        res.status(500).send({error:  error, message: "No se pudo enviar el email desde:" + config.gmailAccount});
+        throw new Error("No se pudo enviar el correo electrónico");
     }
 };
 

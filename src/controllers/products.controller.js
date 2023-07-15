@@ -2,6 +2,9 @@ import config from "../config/config.js";
 import ProductManager from "../Dao/FileSystem/products.service.js";
 import { addProduct, deleteProduct, getProductById, getProducts, getProductsByParams, updateProduct } from "../Dao/DB/products.service.js";
 import customError from "./error.controller.js";
+import userModel from "../Dao/DB/models/user.js";
+import { sendEmail } from "./email.controller.js";
+import config from "../config/config.js";
 
 //Se define el manager de productos 
 const productManager = new ProductManager();
@@ -85,11 +88,35 @@ export const deleteAProduct = async (req, res) => {
     if (userMail != product.owner || userMail != config.adminName){
       customError(401, "You are neither the owner or an admin to do this.")
     }
+    
+    const owner = await userModel.findOne({ email: product.owner });
 
     //Se verifica si existe y lo borra, sino manda error.
     try {
       config.useFS ? productManager.deleteProduct(pid) : await deleteProduct(pid);
- 
+      
+      //Se verifica también si el creador del producto es premium para avisarle que se borró
+      if (owner.role == "premium"){
+        
+        const mailDetails = {
+          from: "BackEnd Proyect " + config.gmailAccount,
+          to: owner.email,
+          subject: `Su producto "${product.title}" fue removido`,
+          html: `
+            <div>
+              <h1>Su producto "${product.title}" fue removido.</h1>
+              
+              <p>Si usted fue quien lo borró, ignore este mensaje. Sino, consulte con un administrador al respecto.</p>
+              
+              <p>El ID de su producto es ${product._id}</p>
+            </div>
+          `,
+          attachments: [],
+        };    
+
+        sendEmail(mailDetails, owner.email);
+      }
+
       res.send("Product deleted.");
     } catch (error) {
       customError(404, error.message);
