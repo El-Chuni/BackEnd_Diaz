@@ -80,10 +80,10 @@ router.get("/callback", passport.authenticate('github', {failureRedirect:'/login
 router.get("/", getUsersList);
 
 //Borra los usuarios que no se hayan conectado desde hace dos días
-router.delete("/", deleteDatedUsers);
+router.delete("/", passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), deleteDatedUsers);
 
 //Borra un usuario en especifico
-router.delete("/:uid", deleteAUser);
+router.delete("/:uid", passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), deleteAUser);
 
 //Sube el archivo (documento) y marca al usuario con el nombre y dirección de lo que se subió
 router.post("/:uid/documents", upload.single("document"), updateUserDocuments);

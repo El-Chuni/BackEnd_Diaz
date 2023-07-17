@@ -21,7 +21,7 @@ const changeRole = async (uid) => {
 // Función para a un usuario en especifico
 const deleteUser = async (uid) => {
     try {
-      const response = await fetch(`/${uid}`, { method: 'DELETE' });
+      const response = await fetch(`/api/users/${uid}`, { method: 'DELETE' });
       if (response.ok) {
         const data = await response.json();
         console.log(data);
