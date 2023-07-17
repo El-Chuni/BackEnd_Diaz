@@ -23,11 +23,13 @@ router.get('/products', async (req,res) => {
   if(!page) page=1;
 
   let content = await productModel.paginate({},{page,limit:10,lean:true});
-  content.prevLink = content.hasPrevPage?`http://localhost:9090/products?page=${content.prevPage}`:'';
-  content.nextLink = content.hasNextPage?`http://localhost:9090/products?page=${content.nextPage}`:'';
-  content.isValid= !(page<=0||page>content.totalPages);
+  content.prevLink = content.hasPrevPage?`http://localhost:8080/views/products?page=${content.prevPage}`:'';
+  content.nextLink = content.hasNextPage?`http://localhost:8080/views/products?page=${content.nextPage}`:'';
+  content.isValid = !(page<=0||page>content.totalPages);
+  const cid = req.session.user.cart;
+  content.cartLink = `http://localhost:8080/views/carts/${cid}`;
 
-  res.render('productsview',{...content, user: req.session.user})
+  res.render('productsView',{...content, user: req.session.user})
 });
 
 

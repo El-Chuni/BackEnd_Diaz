@@ -19,12 +19,15 @@
             <td>{{stock}}</td>
             <td>{{price}}</td>
             <td>{{total}}</td>
+            <td><button class="remove-product" data-pid="{{this._id}}" data-cartId="{{cid}}">Quitar del carrito</button></td>
           </tr>
         {{/each}}
     </tbody>
   </table>
+  <button class="checkout-button" data-cartId="{{cid}}">Pagar y finalizar compra</button>
 {{else}}
   <p>No hay productos en el carrito.</p>
 {{/if}}
 
 <script src="/socket.io/socket.io.js"></script>
+<script src="/js/carts.js"></script>

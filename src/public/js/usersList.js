@@ -35,7 +35,7 @@ const deleteUser = async (uid) => {
     }
 };
 
-// Agregar el evento click a los botón de ascender/degradar usuario
+// Agregar el evento click al botón de ascender/degradar usuario
 changeRoleButtons.forEach((button) => {
   button.addEventListener('click', () => {
     const uid = button.dataset.uid;

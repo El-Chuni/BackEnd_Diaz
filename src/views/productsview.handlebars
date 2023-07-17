@@ -2,6 +2,7 @@
 {{#if user}}
   <div>
     <p>Bienvenido, {{user.role}} {{user.name}}.</p>
+    <a href={{cartLink}}>Tu carrito</a>
     <button><a href="/api/user/logout">Cerrar sesión</a></button>
   </div>
 {{/if}}
@@ -14,7 +15,7 @@
             <p>Descripción: {{this.description}}</p>
             <p>Stock actual: {{this.stock}}</p>
             <p>Categoría: {{this.category}}</p>
-            <button>Agregar al carrito</button>
+            <button class="add-product" data-pid="{{this._id}}" data-user="{{user.cart}}">Agregar al carrito</button>
         </div>
     </div>
     <br/>
@@ -37,3 +38,4 @@
   <p>(O tal vez intentaste ver la lista con una página inexistente)</p>
 {{/if}}
 
+<script src="/js/productsView.js"></script>
