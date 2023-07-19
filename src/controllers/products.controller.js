@@ -4,7 +4,6 @@ import { addProduct, deleteProduct, getProductById, getProducts, getProductsByPa
 import customError from "./error.controller.js";
 import userModel from "../Dao/DB/models/user.js";
 import { sendEmail } from "./email.controller.js";
-import config from "../config/config.js";
 
 //Se define el manager de productos 
 const productManager = new ProductManager();
