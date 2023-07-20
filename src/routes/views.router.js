@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { getCartById } from "../Dao/DB/carts.service.js";
 import { productModel } from "../Dao/DB/models/products.js";
-import { getProducts, getProductsByParams} from "../Dao/DB/products.service.js";
 import ProductManager from "../ProductManager.js";
 
 
@@ -18,18 +17,19 @@ router.get('/', (req,res) => {
 //Originalmente e planeaba usar cierta función de service (que de hecho funciona)
 //pero su estructura no funcionaba acá porque Handlebars no lo leía, así que
 //hice un paginate directo.
-router.get('/products', async (req,res) => {
-  let page = parseInt(req.query.page);
-  if(!page) page=1;
+router.get('/products', async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = 10;
 
-  let content = await productModel.paginate({},{page,limit:10,lean:true});
-  content.prevLink = content.hasPrevPage?`http://localhost:8080/views/products?page=${content.prevPage}`:'';
-  content.nextLink = content.hasNextPage?`http://localhost:8080/views/products?page=${content.nextPage}`:'';
-  content.isValid = !(page<=0||page>content.totalPages);
-  const cid = req.session.user.cart;
-  content.cartLink = `http://localhost:8080/views/carts/${cid}`;
+  const content = await productModel.paginate({}, { page, limit, lean: true });
+  const prevLink = content.hasPrevPage ? `/views/products?page=${content.prevPage}` : '';
+  const nextLink = content.hasNextPage ? `/views/products?page=${content.nextPage}` : '';
+  const isValid = !(page <= 0 || page > content.totalPages);
+  const user = req.session.user;
+  const cid = user ? user.cart : null;
+  const cartLink = cid ? `/views/carts/${cid}` : '';
 
-  res.render('productsView',{...content, user: req.session.user})
+  res.render('productsView', { ...content, prevLink, nextLink, isValid, user, cartLink });
 });
 
 

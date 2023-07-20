@@ -15,7 +15,7 @@ En la carpeta base/raiz, ejecute los siguientes comandos por separado en cmd (o 
 
 -npm install
 
--npm run start
+-npm start run
 
 Si quiere experimentar con esta app, se le sugiere hacer esta opción para jugar con el codigo, despues de todo el sitio web es open source.
 

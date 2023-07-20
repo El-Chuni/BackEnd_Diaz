@@ -4,7 +4,7 @@ const deleteUserButtons = document.querySelectorAll('.delete-user');
 // Función para enviar la solicitud de cambio de rol al endpoint correspondiente
 const changeRole = async (uid) => {
   try {
-    const response = await fetch(`/api/users/premium/${uid}`, { method: 'GET' });
+    const response = await fetch(`/api/user/premium/${uid}`, { method: 'GET' });
     if (response.ok) {
       const data = await response.json();
       console.log(data);
@@ -21,7 +21,7 @@ const changeRole = async (uid) => {
 // Función para a un usuario en especifico
 const deleteUser = async (uid) => {
     try {
-      const response = await fetch(`/api/users/${uid}`, { method: 'DELETE' });
+      const response = await fetch(`/api/user/${uid}`, { method: 'DELETE' });
       if (response.ok) {
         const data = await response.json();
         console.log(data);

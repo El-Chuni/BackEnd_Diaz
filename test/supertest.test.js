@@ -259,7 +259,7 @@ describe("Testing BackEnd Project App", () => {
             //Given:
             
             //Then:
-            const {statusCode} = (await requester.get("/api/users/premium"));
+            const {statusCode} = (await requester.get("/api/user/premium"));
             console.log(statusCode);
 
             //AssertThat:

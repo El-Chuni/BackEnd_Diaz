@@ -10,6 +10,19 @@
 
     <body>
         
+        <header>
+            <nav>
+                <ul>
+                    <li><a href="/views/products">Ver Productos</a></li>
+                    {{#if user}}
+                        <li><a href="/api/user/logout">Cerrar Sesión</a></li>
+                    {{else}}
+                        <li><a href="/api/user/login">Iniciar Sesión</a></li>
+                    {{/if}}
+                </ul>
+            </nav>
+        </header>
+
         {{{body}}}
 
     </body>
