@@ -44,7 +44,10 @@ const upload = multer({ storage });
 
 //Registramos al usuario
 router.post("/post/register", passport.authenticate('register',{failureRedirect:'/failregister'}), async (req, res)=>{
-    res.status(201).send({status: "success", message: "Usuario creado con extito con ID: " + req.user.id});
+    passport.authenticate('login', { failureRedirect: '/faillogin' })(req, res, () => {
+        //Una vez registrado, usamos el passport de login para ingresarlo y enviarlo a los productos
+        res.redirect('/views/products');
+    });
 });
 
   
