@@ -5,6 +5,15 @@ import userModel from "../Dao/DB/models/user.js";
 import { createHash, isValidPassword } from "../utils.js";
 import config from "./config.js"
 
+//Una condición para register para darle un rol al usuario
+const assignRole = (email, password) => {
+    if (email === config.adminName && password === config.adminPassword) {
+        return 'admin';
+    } else {
+        return 'usuario';
+    }
+}
+
 //Declaramos nuestra estrategia:
 const localStrategy = passportLocal.Strategy;
 const initializePassport = () => {
@@ -52,16 +61,16 @@ const initializePassport = () => {
     passport.use('register', new localStrategy(
         {passReqToCallback: true, usernameField: 'email'}, async (req, username, password, done) => {
             const {first_name, last_name, email, age} = req.body;
-            let role = "usuario";
             try {
                 const exists = await userModel.findOne({email});
                 if (exists){
                     console.log("El usuario ya existe.");
                     return done(null, false);
                 };
-                if (email == "soyadmin" && password == "admin"){
-                    role = "admin";
-                }
+                
+                //Le da el rol según su email y contraseña
+                const role = assignRole(email, password);
+
                 const user = {
                     first_name,
                     last_name,

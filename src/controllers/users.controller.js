@@ -95,6 +95,20 @@ export const updateUserDocuments = async (req, res) => {
     }
 };
 
+//Un middleware que revisa el rol del usuario y lo guarda en la sesión
+export const checkUserRole = async (req, res, next) => {
+    try {
+        const user = await userModel.findOne({ email: req.body.username }); // o req.session.user.email si ya está en la sesión
+        if (user) {
+            req.session.user.role = user.role;
+        }
+        next();
+    } catch (error) {
+        console.error("Error al verificar el rol del usuario:", error);
+        res.status(500).send("Error interno del servidor");
+    }
+};
+
 //Cambia el rol de usuario a premium y viceversa
 export const updateUserRole = async (req, res) =>{
     let uid = req.params.uid;

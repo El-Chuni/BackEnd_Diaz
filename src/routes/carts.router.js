@@ -2,6 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import passport from "passport";
 import { addACart, cleanCart, eliminateCart, getACartById, getAllCarts, purchaseCartContent, removeProductFromCart, updateCartProductQuantity, updateProductInCart } from "../controllers/carts.controller.js";
+import customError from "../controllers/error.controller.js";
 
 //Se define el router
 const router = Router();
