@@ -2,6 +2,20 @@ import userModel from "../Dao/DB/models/user.js";
 import customError from "../controllers/error.controller.js";
 import __dirname from "../utils.js";  
   
+//Middleware para guardar el role de usuario en la sesión
+export const checkUserRole = async (req, res, next) => {
+    try {
+      const user = await userModel.findOne({ email: req.body.username }); // o req.session.user.email si ya está en la sesión
+      if (user) {
+        req.session.user.role = user.role;
+      }
+      next();
+    } catch (error) {
+      console.error("Error al verificar el rol del usuario:", error);
+      res.status(500).send("Error interno del servidor");
+    }
+};
+
 //Ingresa el usuario
 export const loginUser = async (req, res)=>{
     const user = req.user;
@@ -92,20 +106,6 @@ export const updateUserDocuments = async (req, res) => {
       res.status(200).send({ message: "Document uploaded to the user." });
     } catch (error) {
       customError(500, error.message);
-    }
-};
-
-//Un middleware que revisa el rol del usuario y lo guarda en la sesión
-export const checkUserRole = async (req, res, next) => {
-    try {
-        const user = await userModel.findOne({ email: req.body.username }); // o req.session.user.email si ya está en la sesión
-        if (user) {
-            req.session.user.role = user.role;
-        }
-        next();
-    } catch (error) {
-        console.error("Error al verificar el rol del usuario:", error);
-        res.status(500).send("Error interno del servidor");
     }
 };
 

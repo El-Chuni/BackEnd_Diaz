@@ -3,7 +3,7 @@ import passport from "passport";
 import customError from "../controllers/error.controller.js";
 import multer from "multer";
 import __dirname from "../utils.js";
-import { changePassword, deleteAUser, deleteDatedUsers, getUsersList, loginUser, logoutUser, updateUserDocuments, updateUserRole } from "../controllers/users.controller.js";
+import { changePassword, checkUserRole, deleteAUser, deleteDatedUsers, getUsersList, loginUser, logoutUser, updateUserDocuments, updateUserRole } from "../controllers/users.controller.js";
 
 const router = Router();
 
@@ -83,16 +83,16 @@ router.get("/callback", passport.authenticate('github', {failureRedirect:'/login
 router.get("/", getUsersList);
 
 //Borra los usuarios que no se hayan conectado desde hace dos días
-router.delete("/", passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), deleteDatedUsers);
+router.delete("/", checkUserRole, passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), deleteDatedUsers);
 
 //Borra un usuario en especifico
-router.delete("/:uid", passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), deleteAUser);
+router.delete("/:uid", checkUserRole, passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), deleteAUser);
 
 //Sube el archivo (documento) y marca al usuario con el nombre y dirección de lo que se subió
 router.post("/:uid/documents", upload.single("document"), updateUserDocuments);
 
 //Cambia el rol de usuario a premium y viceversa
-router.get("/premium/:uid", passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), updateUserRole);
+router.get("/premium/:uid", checkUserRole, passport.authenticate('onlyAdmin', { failureRedirect: '/forbidden' }), updateUserRole);
 
 //Un aviso si la autentificación falla en ciertas funciones
 router.get('/forbidden', async (req,res) => {
