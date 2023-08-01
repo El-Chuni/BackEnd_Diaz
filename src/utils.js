@@ -19,5 +19,29 @@ export const isValidPassword = (user, password) => {
     return bcrypt.compareSync(password, user.password);
 }
 
+export const ensureAdmin = (req, res, next) => {
+    if (req.user && req.user.role == 'admin') {
+        return next();
+    } else {
+        return res.send(401);
+    }
+}
+
+export const ensureUser = (req, res, next) => {
+    if (req.user && req.user.role != 'admin') {
+        return next();
+    } else {
+        return res.send(401);
+    }
+}
+
+export const ensureUncommon = (req, res, next) => {
+    if (req.user && (req.user.role == 'admin' || req.user.role == 'premium')) {
+        return next();
+    } else {
+        return res.send(401);
+    }
+}    
+
 
 export default __dirname;

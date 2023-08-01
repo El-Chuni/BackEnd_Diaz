@@ -125,7 +125,7 @@ const initializePassport = () => {
         })
     );
 
-    passport.use('onlyAdmin', new localStrategy({ passReqToCallback: true, usernameField: 'email'},
+    /*passport.use('onlyAdmin', new localStrategy({ passReqToCallback: true, usernameField: 'email'},
         async (req, username, password, done) => {
             const userRole = req.cookies.userRole;
             if (!userRole) {
@@ -177,7 +177,7 @@ const initializePassport = () => {
                 return done(null, false);
             }
         }
-    ));
+    ));*/
 
       
 
