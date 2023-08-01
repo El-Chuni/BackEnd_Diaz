@@ -24,22 +24,22 @@ router.get('/get', getAllCarts)
 router.get('/get/:cid', getACartById)
 
 //Añade un carrito al array.
-router.post('/post', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), upload.array(), addACart)
+router.post('/post', passport.authenticate('onlyUser', { failureRedirect: '/api/carts/forbidden' }), addACart)
 
 //Se añade un producto especifico a un carrito especifico.
-router.post('/post/:cid/product/:pid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), updateProductInCart)
+router.post('/post/:cid/product/:pid', passport.authenticate('onlyUser', { failureRedirect: '/api/carts/forbidden' }), updateProductInCart)
 
 //Limpiamos el carrito y ponemos otros productos en su lugar
-router.put('/put/:cid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), cleanCart)
+router.put('/put/:cid', passport.authenticate('onlyUser', { failureRedirect: '/api/carts/forbidden' }), cleanCart)
 
 //Se actualiza el stock de un producto del carrito con el que le ingresamos
-router.put('/put/:cid/products/:pid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), updateCartProductQuantity)
+router.put('/put/:cid/products/:pid', passport.authenticate('onlyUser', { failureRedirect: '/api/carts/forbidden' }), updateCartProductQuantity)
 
 //Quitamos un producto del carrito (incluyendo su stock)
-router.delete('/delete/:cid/products/:pid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), removeProductFromCart)
+router.delete('/delete/:cid/products/:pid', passport.authenticate('onlyUser', { failureRedirect: '/api/carts/forbidden' }), removeProductFromCart)
 
 //Quitamos el carrito, así de simple.
-router.delete('/delete/:cid', passport.authenticate('onlyUser', { failureRedirect: '/forbidden' }), eliminateCart)
+router.delete('/delete/:cid', passport.authenticate('onlyUser', { failureRedirect: '/api/carts/forbidden' }), eliminateCart)
 
 //Se termina la compra y se envía el ticket.
 router.post('/:cid/purchase', purchaseCartContent);

@@ -146,7 +146,6 @@ const initializePassport = () => {
     passport.use('onlyUser', new localStrategy({ passReqToCallback: true},
         async (req, username, password, done) => {
             const userRole = req.options.userRole;
-            console.log(userRole);
             if (!userRole) {
                 return done(null, false);
             }

@@ -40,7 +40,7 @@ export const getACartById = async (req, res) => {
 
 //Añade un carrito al array.
 export const addACart = async (req,res) => {
-    let products = req.body; 
+    let products = req.body.products; 
 
     const user = req.session.user;
     

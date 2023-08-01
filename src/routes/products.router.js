@@ -31,13 +31,13 @@ router.get('/get/:pid', getAProductById)
 router.get('/mockingproducts', generateMockProducts)
 
 //Añade un producto al array
-router.post('/post', passport.authenticate('forbiddenForCommonUser', { failureRedirect: '/forbidden' }), upload.array(), addAProduct);
+router.post('/post', passport.authenticate('forbiddenForCommonUser', { failureRedirect: '/api/products/forbidden' }), upload.array(), addAProduct);
   
 //Se borra un producto especifico por ID
-router.delete('/delete/:pid', passport.authenticate('forbiddenForCommonUser', { failureRedirect: '/forbidden' }), deleteAProduct)
+router.delete('/delete/:pid', passport.authenticate('forbiddenForCommonUser', { failureRedirect: '/api/products/forbidden' }), deleteAProduct)
 
 //Se actualiza un producto por ID
-router.put('/put/:pid', passport.authenticate('forbiddenForCommonUser', { failureRedirect: '/forbidden' }), upload.array(), updateAProduct)
+router.put('/put/:pid', passport.authenticate('forbiddenForCommonUser', { failureRedirect: '/api/products/forbidden' }), upload.array(), updateAProduct)
 
 
 export default router;

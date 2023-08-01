@@ -20,8 +20,6 @@ const customError = (number, error) => {
             console.error('Unknown error: ', error);
             break;
     }
-
-    res.status(number).send(error);
 };
 
 export default customError;
