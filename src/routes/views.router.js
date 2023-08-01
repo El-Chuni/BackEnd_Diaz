@@ -2,6 +2,7 @@ import { Router } from "express";
 import { getCartById } from "../Dao/DB/carts.service.js";
 import { productModel } from "../Dao/DB/models/products.js";
 import ProductManager from "../ProductManager.js";
+import { addACart } from "../controllers/carts.controller.js";
 
 
 const productManager = new ProductManager();
@@ -25,9 +26,15 @@ router.get('/products', async (req, res) => {
   const prevLink = content.hasPrevPage ? `/views/products?page=${content.prevPage}` : '';
   const nextLink = content.hasNextPage ? `/views/products?page=${content.nextPage}` : '';
   const isValid = !(page <= 0 || page > content.totalPages);
+  
   const user = req.session.user;
-  const cid = user ? user.cart : null;
-  const cartLink = cid ? `/views/carts/${cid}` : '';
+  const userCartId = user && user.cart ? user.cart : null;
+
+  let cartLink = '';
+  if (userCartId) {
+    cartLink = `/views/carts/${userCartId}`;
+  }
+
 
   res.render('productsView', { ...content, prevLink, nextLink, isValid, user, cartLink });
 });

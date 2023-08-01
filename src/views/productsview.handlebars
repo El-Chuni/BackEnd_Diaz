@@ -2,7 +2,9 @@
 {{#if user}}
   <div>
     <p>Bienvenido, {{user.role}} {{user.name}}.</p>
-    <a href={{cartLink}}>Tu carrito</a>
+    {{#if cartLink}}
+      <a href={{cartLink}}>Tu carrito</a>
+    {{/if}}
   </div>
 {{/if}}
 <div>

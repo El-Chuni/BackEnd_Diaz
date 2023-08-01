@@ -4,7 +4,6 @@ import passport from "passport";
 import { addAProduct, deleteAProduct, getAProductById, getProductsByParameters, getProductsList, updateAProduct } from "../controllers/products.controller.js";
 import { generateMockProducts } from "../controllers/mocker.controller.js";
 import customError from "../controllers/error.controller.js";
-import { checkUserRole } from "../controllers/users.controller.js";
 
 //Se define el router
 const router = Router();
@@ -32,13 +31,13 @@ router.get('/get/:pid', getAProductById)
 router.get('/mockingproducts', generateMockProducts)
 
 //Añade un producto al array
-router.post('/post', checkUserRole, passport.authenticate('forbiddenForCommonUser', { failureRedirect: '/forbidden' }), upload.array(), addAProduct);
+router.post('/post', passport.authenticate('forbiddenForCommonUser', { failureRedirect: '/forbidden' }), upload.array(), addAProduct);
   
 //Se borra un producto especifico por ID
-router.delete('/delete/:pid', checkUserRole, passport.authenticate('forbiddenForCommonUser', { failureRedirect: '/forbidden' }), deleteAProduct)
+router.delete('/delete/:pid', passport.authenticate('forbiddenForCommonUser', { failureRedirect: '/forbidden' }), deleteAProduct)
 
 //Se actualiza un producto por ID
-router.put('/put/:pid', checkUserRole, passport.authenticate('forbiddenForCommonUser', { failureRedirect: '/forbidden' }), upload.array(), updateAProduct)
+router.put('/put/:pid', passport.authenticate('forbiddenForCommonUser', { failureRedirect: '/forbidden' }), upload.array(), updateAProduct)
 
 
 export default router;

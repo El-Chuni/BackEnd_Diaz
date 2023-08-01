@@ -3,7 +3,7 @@ import passportLocal from 'passport-local';
 import GitHubStrategy from 'passport-github2';
 import userModel from "../Dao/DB/models/user.js";
 import { createHash, isValidPassword } from "../utils.js";
-import config from "./config.js"
+import config from "./config.js";
 
 //Una condición para register para darle un rol al usuario
 const assignRole = (email, password) => {
@@ -14,6 +14,7 @@ const assignRole = (email, password) => {
     }
 }
 
+
 //Declaramos nuestra estrategia:
 const localStrategy = passportLocal.Strategy;
 const initializePassport = () => {
@@ -21,6 +22,21 @@ const initializePassport = () => {
      *  Inicializando la estrategia para github.
      *  Done será nuestro callback
     */ 
+
+   //Funciones de Serializacion y Desserializacion
+    passport.serializeUser((user, done) => {
+        done(null, user._id);
+    });
+
+    passport.deserializeUser(async (id, done) => {
+        try {
+            let user = await userModel.findById(id);
+            done(null, user);
+        } catch (error) {
+            console.error("Error deserializando el usuario: " + error);
+        }
+    });
+
     //Estrategia de Login con GitHub:
     passport.use('github', new GitHubStrategy(
         {
@@ -43,7 +59,6 @@ const initializePassport = () => {
                         age: 18,
                         email: profile._json.email,
                         password: '',
-                        loggedBy: "GitHub",
                         role: 'usuario'
                     };
                     const result = await userModel.create(newUser);
@@ -77,8 +92,7 @@ const initializePassport = () => {
                     email,
                     age,
                     password : createHash(password),
-                    role,
-                    loggedBy: "App"
+                    role
                 };
                 const result = await userModel.create(user);
                 //Todo sale OK
@@ -111,10 +125,14 @@ const initializePassport = () => {
         })
     );
 
-    passport.use('onlyAdmin', new localStrategy({ passReqToCallback: true },
+    passport.use('onlyAdmin', new localStrategy({ passReqToCallback: true},
         async (req, username, password, done) => {
-            const user = req.session.user;
-            if (user.role === 'admin') {
+            const userRole = req.cookies.userRole;
+            if (!userRole) {
+                return done(null, false);
+            }
+
+            if (userRole === 'admin') {
                 //El usuario tiene el rol de administrador, se permite el acceso
                 return done(null, user);
             } else {
@@ -124,11 +142,16 @@ const initializePassport = () => {
             }
         }
     ));
-      
-    passport.use('onlyUser', new localStrategy({ passReqToCallback: true },
+
+    passport.use('onlyUser', new localStrategy({ passReqToCallback: true},
         async (req, username, password, done) => {
-            const user = req.session.user;
-            if (user.role !== 'admin') {
+            const userRole = req.options.userRole;
+            console.log(userRole);
+            if (!userRole) {
+                return done(null, false);
+            }
+
+            if (userRole !== 'admin') {
                 //El usuario no tiene el rol de administrador, se permite el acceso
                 return done(null, user);
             } else {
@@ -138,11 +161,15 @@ const initializePassport = () => {
             }
         }
     ));
-      
-    passport.use('forbiddenForCommonUser', new localStrategy({ passReqToCallback: true },
+
+    passport.use('forbiddenForCommonUser', new localStrategy({ passReqToCallback: true},
         async (req, username, password, done) => {
-            const user = req.session.user;
-            if (user.role !== 'usuario') {
+            const userRole = req.cookies.userRole;
+            if (!userRole) {
+                return done(null, false);
+            }
+
+            if (userRole !== 'usuario') {
                 //El usuario no tiene el rol de usuario, se permite el acceso
                 return done(null, user);
             } else {
@@ -152,21 +179,10 @@ const initializePassport = () => {
             }
         }
     ));
+
       
 
-    //Funciones de Serializacion y Desserializacion
-    passport.serializeUser((user, done) => {
-        done(null, user._id);
-    });
-
-    passport.deserializeUser(async (id, done) => {
-        try {
-            let user = await userModel.findById(id);
-            done(null, user);
-        } catch (error) {
-            console.error("Error deserializando el usuario: " + error);
-        }
-    });
+    
 };
 
 export default initializePassport;

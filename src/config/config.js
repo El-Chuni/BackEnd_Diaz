@@ -31,4 +31,5 @@ export default {
     twilioAuthToken: process.env.TWILIO_AUTH_TOKEN, 
     twilioSMSNumber: process.env.TWILIO_SMS_NUMBER,
     useFS: program.opts().fs,
+    jwtSecret: process.env.JWT_SECRET
 };

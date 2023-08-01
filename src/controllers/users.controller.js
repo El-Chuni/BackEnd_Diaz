@@ -1,20 +1,6 @@
 import userModel from "../Dao/DB/models/user.js";
 import customError from "../controllers/error.controller.js";
 import __dirname from "../utils.js";  
-  
-//Middleware para guardar el role de usuario en la sesión
-export const checkUserRole = async (req, res, next) => {
-    try {
-      const user = await userModel.findOne({ email: req.body.username }); // o req.session.user.email si ya está en la sesión
-      if (user) {
-        req.session.user.role = user.role;
-      }
-      next();
-    } catch (error) {
-      console.error("Error al verificar el rol del usuario:", error);
-      res.status(500).send("Error interno del servidor");
-    }
-};
 
 //Ingresa el usuario
 export const loginUser = async (req, res)=>{
@@ -23,9 +9,12 @@ export const loginUser = async (req, res)=>{
     req.session.user= {
         name : `${user.first_name} ${user.last_name}`,
         email: user.email,
-        age: user.age
+        age: user.age,
+        role: user.role
     };
     await userModel.findByIdAndUpdate(user._id, { last_connection: Date.now()});
+    const userRole = user.role;
+    res.cookie('userRole', userRole, { httpOnly: true });
     res.send({status:"success", payload:req.session.user, message:"¡Primer logueo realizado! :)" });
 };
 
@@ -159,7 +148,7 @@ export const logoutUser = async (req, res) => {
         await userModel.findByIdAndUpdate(user._id, { last_connection: Date.now() });
     
         // Redireccionamos o enviamos una respuesta, dependiendo de tus necesidades
-        res.render("/login");
+        res.render("login");
     } catch (error) {
         console.error("Error al cerrar la sesión:", error);
         res.status(500).json({ error: "error_logout", message: "Error al cerrar la sesión" });

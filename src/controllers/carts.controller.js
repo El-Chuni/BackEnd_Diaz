@@ -6,6 +6,7 @@ import ProductManager from "../Dao/FileSystem/products.service.js";
 import { addTicket } from "../Dao/DB/tickets.service.js";
 import { sendTicketByEmail } from "./email.controller.js";
 import customError from "./error.controller.js";
+import userModel from "../Dao/DB/models/user.js";
 
 //Carga y muestra cada carrito
 export const getAllCarts = async (req,res) => {
@@ -67,6 +68,10 @@ export const addACart = async (req,res) => {
         }else{
             newCart = await CartManager.addCart({ products });
         }
+
+        //Se actualiza el session user para que pueda usarse el cart en la misma sesión
+        const updatedUser = await userModel.findByIdAndUpdate(user._id, {cart: newCart._id})
+        req.session.user = updatedUser;
 
         console.log('Cart created:', newCart);
         res.send(newCart);
