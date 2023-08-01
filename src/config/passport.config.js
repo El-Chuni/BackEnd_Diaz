@@ -125,7 +125,7 @@ const initializePassport = () => {
         })
     );
 
-    passport.use('onlyAdmin', new localStrategy({ passReqToCallback: true},
+    passport.use('onlyAdmin', new localStrategy({ passReqToCallback: true, usernameField: 'email'},
         async (req, username, password, done) => {
             const userRole = req.cookies.userRole;
             if (!userRole) {
@@ -143,7 +143,7 @@ const initializePassport = () => {
         }
     ));
 
-    passport.use('onlyUser', new localStrategy({ passReqToCallback: true},
+    passport.use('onlyUser', new localStrategy({ passReqToCallback: true, usernameField: 'email'},
         async (req, username, password, done) => {
             const userRole = req.options.userRole;
             if (!userRole) {
@@ -161,7 +161,7 @@ const initializePassport = () => {
         }
     ));
 
-    passport.use('forbiddenForCommonUser', new localStrategy({ passReqToCallback: true},
+    passport.use('forbiddenForCommonUser', new localStrategy({ passReqToCallback: true, usernameField: 'email'},
         async (req, username, password, done) => {
             const userRole = req.cookies.userRole;
             if (!userRole) {
