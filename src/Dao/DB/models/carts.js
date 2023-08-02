@@ -9,18 +9,15 @@ const cartSchema = new mongoose.Schema({
       product: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'products',
-        required: true,
       },
       //Renombré stock a quantity para evitar conflictos
       quantity: {
         type: Number,
-        required: true,
         default: 1,
       },
     }],
     default: [],
-    required: true,
-  },
+  }
 });
 
 

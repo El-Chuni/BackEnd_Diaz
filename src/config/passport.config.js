@@ -4,6 +4,7 @@ import GitHubStrategy from 'passport-github2';
 import userModel from "../Dao/DB/models/user.js";
 import { createHash, isValidPassword } from "../utils.js";
 import config from "./config.js";
+import { addCart } from "../Dao/DB/carts.service.js";
 
 //Una condición para register para darle un rol al usuario
 const assignRole = (email, password) => {
@@ -86,14 +87,18 @@ const initializePassport = () => {
                 //Le da el rol según su email y contraseña
                 const role = assignRole(email, password);
 
+                const cart = await addCart();
+
                 const user = {
                     first_name,
                     last_name,
                     email,
                     age,
                     password : createHash(password),
-                    role
+                    role,
+                    cart: cart._id
                 };
+                
                 const result = await userModel.create(user);
                 //Todo sale OK
                 return done(null, result);

@@ -47,39 +47,11 @@ const addOrUpdateProductInCart = async (cid, pid) => {
   }
 };
 
-//Crea un carrito y agrega un producto si user.cart es null o undefined
-const addProductToNewCart = async (pid) => {
-  try {
-    const response = await fetch(`/api/carts/post/`, {
-      method: 'POST',
-      body: JSON.stringify({ products: [{ product: pid }] }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log(data);
-      location.reload();
-    } else {
-      console.error('Error al crear un nuevo carrito y agregar el producto:', response.statusText);
-    }
-  } catch (error) {
-    console.error('Error al realizar la solicitud:', error);
-  }
-};
-
 // Agrega el evento click a los botones de agregar producto
 addProductButtons.forEach((button) => {
   button.addEventListener('click', () => {
     const pid = button.dataset.pid;
     const user = button.dataset.user;
-
-    if (user.cart) {
-      addOrUpdateProductInCart(user.cart, pid);
-    } else {
-      addProductToNewCart(pid);
-    }
+    addOrUpdateProductInCart(user.cart, pid);
   });
 });

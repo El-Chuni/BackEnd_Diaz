@@ -38,14 +38,14 @@ export const getACartById = async (req, res) => {
     //cartFound ? res.send(cartFound) : res.status(404).send({status: "Error", message: "The cart doesn't exist, use the normal GET to check the inventory."});
 }
 
-//Añade un carrito al array.
+//Añade un carrito
 export const addACart = async (req,res) => {
     let products = req.body.products; 
 
-    const user = req.session.user;
+    //const user = req.session.user;
     
     //Se filtran los productos para quitar lo creado por el premium
-    if (user.role === 'premium') {
+    /*if (user.role === 'premium') {
         const removedProducts = products.filter(product => product.owner === user.email);
         products = products.filter(product => product.owner !== user.email);
     
@@ -56,7 +56,7 @@ export const addACart = async (req,res) => {
             console.log('- ' + product.name);
           });
         }
-    }
+    }*/
 
     try{
         if (!config.useFS) {
@@ -68,11 +68,7 @@ export const addACart = async (req,res) => {
         }else{
             newCart = await CartManager.addCart({ products });
         }
-
-        //Se actualiza el session user para que pueda usarse el cart en la misma sesión
-        const updatedUser = await userModel.findByIdAndUpdate(user._id, {cart: newCart._id})
-        req.session.user = updatedUser;
-
+        
         console.log('Cart created:', newCart);
         res.send(newCart);
     } catch (error) {

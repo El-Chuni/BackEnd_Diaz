@@ -1,19 +1,24 @@
 const form = document.getElementById('loginForm');
 
-form.addEventListener('submit',e=>{
+form.addEventListener('submit', async e=>{
     e.preventDefault();
     const data = new FormData(form);
     const obj = {};
     data.forEach((value,key)=>obj[key]=value);
-    fetch('/api/user/post/login',{
-        method:'POST',
-        body:JSON.stringify(obj),
-        headers:{
-            'Content-Type':'application/json'
+
+    //Llama para ingresar al usuario
+    const response = await fetch('/api/user/post/login', {
+        method: "POST",
+        body: JSON.stringify(obj),
+        headers: {
+            "Content-Type": "application/json"
         }
-    }).then(result=>{
-        if(result.status===200){
-            window.location.replace('/views/products');
-        }
+        
     })
+
+    //Si ingresa, se le redirige al index
+    const responseData = await response.json();
+    if (responseData.status === "success"){
+        window.location.replace("/");
+    }
 })
