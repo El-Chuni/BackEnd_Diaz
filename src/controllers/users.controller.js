@@ -13,8 +13,6 @@ export const loginUser = async (req, res)=>{
         role: user.role
     };
     await userModel.findByIdAndUpdate(user._id, { last_connection: Date.now()});
-    const userRole = user.role;
-    res.cookie('userRole', userRole, { httpOnly: true });
     res.send({status:"success", payload:req.session.user, message:"¡Primer logueo realizado! :)" });
 };
 

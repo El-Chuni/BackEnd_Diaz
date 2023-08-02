@@ -45,12 +45,7 @@ const upload = multer({ storage });
 
 //Registramos al usuario
 router.post("/post/register", passport.authenticate('register',{failureRedirect:'/api/user/failregister'}), async (req, res)=>{
-    passport.authenticate('login', { failureRedirect: '/api/user/faillogin' })(req, res, () => {
-        //Una vez registrado, usamos el passport de login para ingresarlo y enviarlo a los productos
-        const userRole = req.session.user.role;
-        res.cookie('userRole', userRole, { httpOnly: true });
-        res.redirect('/');
-    });
+    res.redirect('/');
 });
 
   
